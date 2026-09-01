@@ -1,0 +1,39 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_heli.gd" id="1_heli"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/fuel_component.gd" id="3_fuel"]
+[ext_resource type="Script" path="res://scripts/components/progression_component.gd" id="4_prog"]
+[ext_resource type="PackedScene" path="res://scenes/player/player_helicopter_visual.tscn" id="5_visual"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_col"]
+radius = 1.3
+height = 4.8
+
+[node name="PlayerHeli" type="CharacterBody3D"]
+collision_layer = 1
+collision_mask = 22
+script = ExtResource("1_heli")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+
+[node name="FuelComponent" type="Node" parent="."]
+script = ExtResource("3_fuel")
+
+[node name="ProgressionComponent" type="Node" parent="."]
+script = ExtResource("4_prog")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_col")
+
+[node name="MuzzleRayCast" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.0)
+target_position = Vector3(0, 0, -35)
+collision_mask = 4
+
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="PlayerHelicopterVisual" parent="VisualRoot" instance=ExtResource("5_visual")]
+transform = Transform3D(1.65, 0, 0, 0, 1.65, 0, 0, 0, 1.65, 0, 0, 0)

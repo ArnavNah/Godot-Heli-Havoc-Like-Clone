@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/upgrade_data.gd" id="1_upg"]
+
+[resource]
+script = ExtResource("1_upg")
+id = "turn_speed"
+title = "Turn Speed"
+icon_text = "🔄"
+card_color = Color(0.3, 0.65, 0.95, 1)
+max_level = 5
+stat_type = "turn_speed"
+base_multiplier_per_level = 0.15
+flat_value_per_level = 0.0
+description_template = "+%d%% Lateral Weaving"

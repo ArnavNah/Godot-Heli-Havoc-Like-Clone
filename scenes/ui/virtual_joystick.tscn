@@ -1,0 +1,63 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/virtual_joystick.gd" id="1_joy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ring"]
+bg_color = Color(0.1, 0.15, 0.25, 0.55)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3, 0.7, 1, 0.75)
+corner_radius_top_left = 65
+corner_radius_top_right = 65
+corner_radius_bottom_right = 65
+corner_radius_bottom_left = 65
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_knob"]
+bg_color = Color(0.25, 0.75, 1, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.9)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+shadow_size = 6
+
+[node name="VirtualJoystick" type="Control"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 150.0
+offset_bottom = 150.0
+script = ExtResource("1_joy")
+
+[node name="BaseRing" type="Panel" parent="."]
+custom_minimum_size = Vector2(130, 130)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -65.0
+offset_top = -65.0
+offset_right = 65.0
+offset_bottom = 65.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ring")
+
+[node name="Knob" type="Panel" parent="BaseRing"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 90.0
+offset_bottom = 90.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_knob")

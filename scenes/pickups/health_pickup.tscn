@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/components/base_pickup.gd" id="1_pickup"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_col"]
+radius = 1.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_box"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_case"]
+albedo_color = Color(0.15, 0.22, 0.3, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_cross_v"]
+size = Vector3(0.35, 0.9, 1.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cross_h"]
+size = Vector3(0.9, 0.35, 1.25)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_green"]
+albedo_color = Color(0.15, 0.95, 0.4, 1)
+emission_enabled = true
+emission = Color(0.15, 0.95, 0.4, 1)
+emission_energy_multiplier = 1.2
+
+[node name="HealthPickup" type="Area3D"]
+collision_layer = 32
+collision_mask = 2
+script = ExtResource("1_pickup")
+pickup_type = 2
+value = 25
+effect_color = Color(0.2, 0.95, 0.4, 1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_col")
+
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="CaseMesh" type="MeshInstance3D" parent="VisualRoot"]
+mesh = SubResource("BoxMesh_box")
+surface_material_override/0 = SubResource("StandardMaterial3D_case")
+
+[node name="CrossVertical" type="MeshInstance3D" parent="VisualRoot"]
+mesh = SubResource("BoxMesh_cross_v")
+surface_material_override/0 = SubResource("StandardMaterial3D_green")
+
+[node name="CrossHorizontal" type="MeshInstance3D" parent="VisualRoot"]
+mesh = SubResource("BoxMesh_cross_h")
+surface_material_override/0 = SubResource("StandardMaterial3D_green")

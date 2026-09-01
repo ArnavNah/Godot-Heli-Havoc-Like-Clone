@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/treadmill_level.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/player/player_heli.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/player/camera_rig.tscn" id="3_cam"]
+[ext_resource type="Script" path="res://scripts/environment/endless_grid_manager.gd" id="4_grid"]
+[ext_resource type="PackedScene" path="res://scenes/ui/heli_hud.tscn" id="5_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_up_screen.tscn" id="6_lvlup"]
+
+[sub_resource type="Environment" id="Environment_weaver"]
+background_mode = 1
+background_color = Color(0.38, 0.68, 0.98, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.7, 0.85, 1, 1)
+ambient_light_energy = 0.8
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.38, 0.68, 0.98, 1)
+fog_density = 0.048
+fog_depth_begin = 10.0
+fog_depth_end = 32.0
+
+[node name="TreadmillLevel" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_weaver")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.819152, -0.40558, 0.40558, 0, 0.707107, 0.707107, -0.573576, -0.579228, 0.579228, 0, 50, 0)
+light_color = Color(1, 0.98, 0.95, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="PlayerHeli" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+
+[node name="CameraRig" parent="." instance=ExtResource("3_cam")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+target_path = NodePath("../PlayerHeli")
+
+[node name="EndlessGridManager" type="Node3D" parent="."]
+script = ExtResource("4_grid")
+player_node_path = NodePath("../PlayerHeli")
+
+[node name="HeliHUD" parent="." instance=ExtResource("5_hud")]
+player_path = NodePath("../PlayerHeli")
+
+[node name="LevelUpCanvasLayer" type="CanvasLayer" parent="."]
+layer = 20
+
+[node name="LevelUpScreen" parent="LevelUpCanvasLayer" instance=ExtResource("6_lvlup")]

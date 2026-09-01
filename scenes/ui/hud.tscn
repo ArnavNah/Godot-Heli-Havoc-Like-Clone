@@ -1,0 +1,510 @@
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_top_left"]
+font_size = 20
+font_color = Color(1, 1, 1, 1)
+outline_size = 4
+outline_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shield_badge"]
+bg_color = Color(1, 0.78, 0.1, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.2, 0.15, 0.05, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 6.0
+content_margin_top = 2.0
+content_margin_right = 6.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_bg"]
+bg_color = Color(0.04, 0.38, 0.42, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.02, 0.22, 0.25, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_fill"]
+bg_color = Color(1, 0.8, 0.1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="LabelSettings" id="LabelSettings_stats"]
+font_size = 19
+font_color = Color(1, 1, 1, 1)
+outline_size = 4
+outline_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_score"]
+font_size = 19
+font_color = Color(1, 0.88, 0.2, 1)
+outline_size = 4
+outline_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wave_pill"]
+bg_color = Color(0.08, 0.12, 0.18, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.3, 0.4, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 4.0
+content_margin_right = 14.0
+content_margin_bottom = 4.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_wave"]
+font_size = 17
+font_color = Color(1, 1, 1, 1)
+outline_size = 3
+outline_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_btn"]
+bg_color = Color(0.12, 0.16, 0.22, 0.85)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.25, 0.35, 0.45, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_heart_badge"]
+bg_color = Color(0.9, 0.15, 0.15, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.2, 0.05, 0.05, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 16
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg_hp"]
+bg_color = Color(0.25, 0.05, 0.05, 0.9)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.15, 0.02, 0.02, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.98, 0.22, 0.18, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_bar_val"]
+font_size = 20
+font_color = Color(1, 1, 1, 1)
+outline_size = 5
+outline_color = Color(0.1, 0.02, 0.02, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg_boost"]
+bg_color = Color(0.25, 0.18, 0.02, 0.9)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.15, 0.1, 0.02, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boost_fill"]
+bg_color = Color(1, 0.8, 0.05, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_boost_val"]
+font_size = 20
+font_color = Color(1, 1, 1, 1)
+outline_size = 5
+outline_color = Color(0.15, 0.1, 0.02, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lightning_badge"]
+bg_color = Color(1, 0.78, 0.08, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.2, 0.15, 0.02, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 6
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_survive"]
+font_size = 56
+font_color = Color(1, 0.85, 0.1, 1)
+outline_size = 12
+outline_color = Color(0.05, 0.05, 0.05, 1)
+shadow_size = 8
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="Animation" id="Animation_banner"]
+resource_name = "show_banner"
+length = 2.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 2.0, 2.5),
+"transitions": PackedFloat32Array(0.5, 2, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0.5, 0.5), Vector2(1.2, 1.2), Vector2(1, 1), Vector2(1, 1), Vector2(1.2, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.15, 2.0, 2.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_banner"]
+_data = {
+"show_banner": SubResource("Animation_banner")
+}
+
+[node name="HUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud")
+
+[node name="TopLeft" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 32.0
+offset_top = 28.0
+offset_right = 200.0
+offset_bottom = 140.0
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TopLeft"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="DistanceRow" type="HBoxContainer" parent="TopLeft/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="Label" parent="TopLeft/VBoxContainer/DistanceRow"]
+layout_mode = 2
+text = "⏱️"
+
+[node name="DistanceLabel" type="Label" parent="TopLeft/VBoxContainer/DistanceRow"]
+layout_mode = 2
+text = "512.6m"
+label_settings = SubResource("LabelSettings_top_left")
+
+[node name="GoldRow" type="HBoxContainer" parent="TopLeft/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="Label" parent="TopLeft/VBoxContainer/GoldRow"]
+layout_mode = 2
+text = "🟡"
+
+[node name="GoldLabel" type="Label" parent="TopLeft/VBoxContainer/GoldRow"]
+layout_mode = 2
+text = "24"
+label_settings = SubResource("LabelSettings_top_left")
+
+[node name="KillsRow" type="HBoxContainer" parent="TopLeft/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="Label" parent="TopLeft/VBoxContainer/KillsRow"]
+layout_mode = 2
+text = "💀"
+
+[node name="KillsLabel" type="Label" parent="TopLeft/VBoxContainer/KillsRow"]
+layout_mode = 2
+text = "2"
+label_settings = SubResource("LabelSettings_top_left")
+
+[node name="TopCenter" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -160.0
+offset_top = 24.0
+offset_right = 160.0
+offset_bottom = 130.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TopCenter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="XPBarRow" type="HBoxContainer" parent="TopCenter/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ShieldBadge" type="PanelContainer" parent="TopCenter/VBoxContainer/XPBarRow"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_shield_badge")
+
+[node name="ShieldIcon" type="Label" parent="TopCenter/VBoxContainer/XPBarRow/ShieldBadge"]
+layout_mode = 2
+text = "🛡️"
+
+[node name="XPProgressBar" type="ProgressBar" parent="TopCenter/VBoxContainer/XPBarRow"]
+custom_minimum_size = Vector2(230, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_xp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_xp_fill")
+value = 25.0
+show_percentage = false
+
+[node name="StatsRow" type="HBoxContainer" parent="TopCenter/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="TimeRow" type="HBoxContainer" parent="TopCenter/VBoxContainer/StatsRow"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TimeIcon" type="Label" parent="TopCenter/VBoxContainer/StatsRow/TimeRow"]
+layout_mode = 2
+text = "⏱️"
+
+[node name="TimerLabel" type="Label" parent="TopCenter/VBoxContainer/StatsRow/TimeRow"]
+layout_mode = 2
+text = "28.6"
+label_settings = SubResource("LabelSettings_stats")
+
+[node name="ScoreRow" type="HBoxContainer" parent="TopCenter/VBoxContainer/StatsRow"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TrophyIcon" type="Label" parent="TopCenter/VBoxContainer/StatsRow/ScoreRow"]
+layout_mode = 2
+text = "🏆"
+
+[node name="ScoreLabel" type="Label" parent="TopCenter/VBoxContainer/StatsRow/ScoreRow"]
+layout_mode = 2
+text = "3,450"
+label_settings = SubResource("LabelSettings_score")
+
+[node name="WaveBadge" type="PanelContainer" parent="TopCenter/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_wave_pill")
+
+[node name="WaveLabel" type="Label" parent="TopCenter/VBoxContainer/WaveBadge"]
+layout_mode = 2
+text = "WAVE  3/5"
+label_settings = SubResource("LabelSettings_wave")
+
+[node name="TopRight" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -84.0
+offset_top = 28.0
+offset_right = -32.0
+offset_bottom = 80.0
+grow_horizontal = 0
+
+[node name="PauseButton" type="Button" parent="TopRight"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_pause_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_pause_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pause_btn")
+text = "☰"
+
+[node name="BottomCenter" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -80.0
+offset_right = 220.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomCenter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="HealthContainer" type="HBoxContainer" parent="BottomCenter/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="HeartBadge" type="PanelContainer" parent="BottomCenter/HBoxContainer/HealthContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_heart_badge")
+
+[node name="HeartIcon" type="Label" parent="BottomCenter/HBoxContainer/HealthContainer/HeartBadge"]
+layout_mode = 2
+text = "❤️"
+
+[node name="HealthBar" type="ProgressBar" parent="BottomCenter/HBoxContainer/HealthContainer"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg_hp")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+value = 100.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="BottomCenter/HBoxContainer/HealthContainer/HealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "100"
+label_settings = SubResource("LabelSettings_bar_val")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BoostContainer" type="HBoxContainer" parent="BottomCenter/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="BoostBar" type="ProgressBar" parent="BottomCenter/HBoxContainer/BoostContainer"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg_boost")
+theme_override_styles/fill = SubResource("StyleBoxFlat_boost_fill")
+value = 72.0
+show_percentage = false
+
+[node name="BoostLabel" type="Label" parent="BottomCenter/HBoxContainer/BoostContainer/BoostBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "72%"
+label_settings = SubResource("LabelSettings_boost_val")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LightningBadge" type="PanelContainer" parent="BottomCenter/HBoxContainer/BoostContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_lightning_badge")
+
+[node name="LightningIcon" type="Label" parent="BottomCenter/HBoxContainer/BoostContainer/LightningBadge"]
+layout_mode = 2
+text = "⛽"
+
+[node name="CenterBanner" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 110.0
+offset_top = -180.0
+offset_right = 410.0
+offset_bottom = -90.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -0.122173
+pivot_offset = Vector2(150, 45)
+text = "SURVIVE"
+label_settings = SubResource("LabelSettings_survive")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="CenterBanner"]
+libraries = {
+"": SubResource("AnimationLibrary_banner")
+}

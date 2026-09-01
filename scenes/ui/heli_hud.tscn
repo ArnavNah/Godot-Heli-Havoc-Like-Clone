@@ -1,0 +1,280 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/heli_hud.gd" id="1_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/virtual_joystick.tscn" id="2_joy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gold_panel"]
+bg_color = Color(0.1, 0.12, 0.16, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(1, 0.8, 0.1, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_gold"]
+font_size = 18
+font_color = Color(1, 0.88, 0.1, 1)
+outline_size = 4
+outline_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_lvl"]
+font_size = 15
+font_color = Color(1, 1, 1, 1)
+outline_size = 3
+outline_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_bg"]
+bg_color = Color(0.08, 0.1, 0.15, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.2, 0.4, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_fill"]
+bg_color = Color(0.85, 0.25, 0.95, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg_hp"]
+bg_color = Color(0.2, 0.05, 0.05, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.1, 0.02, 0.02, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.95, 0.22, 0.18, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="LabelSettings" id="LabelSettings_bar"]
+font_size = 15
+font_color = Color(1, 1, 1, 1)
+outline_size = 4
+outline_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg_fuel"]
+bg_color = Color(0.2, 0.15, 0.02, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.1, 0.08, 0.01, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fuel_fill"]
+bg_color = Color(1, 0.8, 0.1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shoot_btn"]
+bg_color = Color(0.95, 0.25, 0.2, 0.85)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 0.9)
+corner_radius_top_left = 45
+corner_radius_top_right = 45
+corner_radius_bottom_right = 45
+corner_radius_bottom_left = 45
+shadow_size = 6
+
+[node name="HeliHUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="TopLeft" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 160.0
+offset_bottom = 60.0
+mouse_filter = 2
+
+[node name="GoldContainer" type="PanelContainer" parent="TopLeft"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gold_panel")
+
+[node name="GoldLabel" type="Label" parent="TopLeft/GoldContainer"]
+layout_mode = 2
+text = "GOLD: 0"
+label_settings = SubResource("LabelSettings_gold")
+vertical_alignment = 1
+
+[node name="TopCenter" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_top = 12.0
+offset_right = 140.0
+offset_bottom = 52.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TopCenter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="LevelLabel" type="Label" parent="TopCenter/VBoxContainer"]
+layout_mode = 2
+text = "LEVEL 1  (0 / 25 XP)"
+label_settings = SubResource("LabelSettings_lvl")
+horizontal_alignment = 1
+
+[node name="XPBar" type="ProgressBar" parent="TopCenter/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_xp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_xp_fill")
+value = 0.0
+show_percentage = false
+
+[node name="BottomCenter" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -60.0
+offset_right = 180.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomCenter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="HealthContainer" type="Control" parent="BottomCenter/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HealthBar" type="ProgressBar" parent="BottomCenter/HBoxContainer/HealthContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg_hp")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+value = 100.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="BottomCenter/HBoxContainer/HealthContainer/HealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "HP: 100 / 100"
+label_settings = SubResource("LabelSettings_bar")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FuelContainer" type="Control" parent="BottomCenter/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FuelBar" type="ProgressBar" parent="BottomCenter/HBoxContainer/FuelContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg_fuel")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fuel_fill")
+value = 100.0
+show_percentage = false
+
+[node name="FuelLabel" type="Label" parent="BottomCenter/HBoxContainer/FuelContainer/FuelBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "FUEL: 100%"
+label_settings = SubResource("LabelSettings_bar")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VirtualJoystick" parent="." instance=ExtResource("2_joy")]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -174.0
+offset_right = 174.0
+offset_bottom = -24.0
+grow_vertical = 0
+
+[node name="ShootButton" type="Button" parent="."]
+custom_minimum_size = Vector2(85, 85)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -115.0
+offset_top = -115.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_shoot_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_shoot_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_shoot_btn")
+text = "FIRE"

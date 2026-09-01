@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_controller"]
+[ext_resource type="PackedScene" path="res://scenes/player/player_helicopter_visual.tscn" id="2_vis"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_col"]
+radius = 0.9
+height = 3.2
+
+[node name="PlayerHelicopter" type="CharacterBody3D"]
+collision_layer = 1
+collision_mask = 22
+script = ExtResource("1_controller")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_col")
+
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="PlayerHelicopterVisual" parent="VisualRoot" instance=ExtResource("2_vis")]

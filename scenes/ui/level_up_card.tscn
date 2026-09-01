@@ -1,0 +1,91 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/upgrade_card.gd" id="1_card"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
+bg_color = Color(0.08, 0.12, 0.22, 0.95)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(0.2, 0.6, 1, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_size = 10
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 19
+font_color = Color(1, 1, 1, 1)
+outline_size = 4
+outline_color = Color(0.05, 0.08, 0.12, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_icon"]
+font_size = 48
+
+[sub_resource type="LabelSettings" id="LabelSettings_desc"]
+font_size = 15
+font_color = Color(0.9, 0.95, 1, 1)
+outline_size = 2
+outline_color = Color(0.08, 0.08, 0.12, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_lvl"]
+font_size = 14
+font_color = Color(1, 0.85, 0.2, 1)
+outline_size = 3
+outline_color = Color(0.05, 0.05, 0.1, 1)
+
+[node name="LevelUpCard" type="Button"]
+custom_minimum_size = Vector2(220, 290)
+theme_override_styles/normal = SubResource("StyleBoxFlat_normal")
+script = ExtResource("1_card")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 18
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "MOVEMENT SPEED I"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="IconLabel" type="Label" parent="MarginContainer/VBoxContainer/CenterContainer"]
+layout_mode = 2
+text = "🚀"
+label_settings = SubResource("LabelSettings_icon")
+
+[node name="DescLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(180, 44)
+layout_mode = 2
+text = "+10% Flight Speed"
+label_settings = SubResource("LabelSettings_desc")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="LevelLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "LEVEL 1 / 5"
+label_settings = SubResource("LabelSettings_lvl")
+horizontal_alignment = 1

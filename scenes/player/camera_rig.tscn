@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/camera_rig.gd" id="1_cam"]
+
+[node name="CameraRig" type="Node3D"]
+script = ExtResource("1_cam")
+target_height_offset = 5.2
+spring_length = 9.8
+pitch_degrees = -44.0
+base_fov = 68.0
+
+[node name="SpringArm3D" type="SpringArm3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.71934, 0.694658, 0, -0.694658, 0.71934, 0, 5.2, 0)
+collision_mask = 0
+spring_length = 9.8
+margin = 0.2
+
+[node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
+current = true
+fov = 68.0
+near = 0.1
+far = 800.0

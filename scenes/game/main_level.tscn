@@ -1,0 +1,215 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player/player_helicopter.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/player/camera_rig.tscn" id="2_cam"]
+[ext_resource type="PackedScene" path="res://scenes/environment/building.tscn" id="3_build"]
+[ext_resource type="PackedScene" path="res://scenes/environment/building_dark.tscn" id="4_dark"]
+[ext_resource type="PackedScene" path="res://scenes/environment/building_light.tscn" id="5_light"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/coin_pickup.tscn" id="6_coin"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/xp_pickup.tscn" id="7_xp"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/health_pickup.tscn" id="8_health"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/fuel_pickup.tscn" id="9_fuel"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/powerup_pickup.tscn" id="10_powerup"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="11_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_up_screen.tscn" id="12_lvlup"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_cyan"]
+sky_top_color = Color(0.12, 0.65, 0.99, 1)
+sky_horizon_color = Color(0.55, 0.88, 1, 1)
+ground_bottom_color = Color(0.32, 0.72, 0.98, 1)
+ground_horizon_color = Color(0.55, 0.88, 1, 1)
+sun_angle_max = 24.0
+
+[sub_resource type="Sky" id="Sky_cyan"]
+sky_material = SubResource("ProceduralSkyMaterial_cyan")
+
+[sub_resource type="Environment" id="Environment_world"]
+background_mode = 2
+sky = SubResource("Sky_cyan")
+ambient_light_source = 3
+ambient_light_color = Color(0.65, 0.85, 1, 1)
+ambient_light_sky_contribution = 0.85
+fog_enabled = true
+fog_light_color = Color(0.55, 0.88, 1, 1)
+fog_density = 0.0035
+fog_sky_affect = 0.9
+fog_depth_begin = 40.0
+fog_depth_end = 320.0
+
+[node name="MainLevel" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_world")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.819152, -0.40558, 0.40558, 0, 0.707107, 0.707107, -0.573576, -0.579228, 0.579228, 0, 60, 0)
+light_color = Color(1, 0.98, 0.94, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="CanvasLayer" instance=ExtResource("11_hud")]
+
+[node name="LevelUpScreen" parent="CanvasLayer" instance=ExtResource("12_lvlup")]
+
+[node name="PlayerSpawn" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0)
+
+[node name="PlayerHelicopter" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0)
+
+[node name="CameraRig" parent="." instance=ExtResource("2_cam")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0)
+target_path = NodePath("../PlayerHelicopter")
+
+[node name="CityTowers" type="Node3D" parent="."]
+
+[node name="Tower_L1" parent="CityTowers" instance=ExtResource("4_dark")]
+transform = Transform3D(1.2, 0, 0, 0, 0.6, 0, 0, 0, 1.2, -28, -2, -18)
+
+[node name="Tower_R1" parent="CityTowers" instance=ExtResource("3_build")]
+transform = Transform3D(1.4, 0, 0, 0, 0.8, 0, 0, 0, 1.4, 30, -5, -25)
+
+[node name="Tower_L2" parent="CityTowers" instance=ExtResource("5_light")]
+transform = Transform3D(1.1, 0, 0, 0, 0.75, 0, 0, 0, 1.1, -26, 0, -65)
+
+[node name="Tower_R2" parent="CityTowers" instance=ExtResource("4_dark")]
+transform = Transform3D(1.3, 0, 0, 0, 0.7, 0, 0, 0, 1.3, 28, -10, -80)
+
+[node name="Tower_C1" parent="CityTowers" instance=ExtResource("3_build")]
+transform = Transform3D(0.7, 0, 0, 0, 0.45, 0, 0, 0, 0.7, 0, -18, -115)
+
+[node name="Tower_L3" parent="CityTowers" instance=ExtResource("4_dark")]
+transform = Transform3D(1.5, 0, 0, 0, 0.9, 0, 0, 0, 1.5, -32, 2, -150)
+
+[node name="Tower_R3" parent="CityTowers" instance=ExtResource("5_light")]
+transform = Transform3D(1.2, 0, 0, 0, 0.65, 0, 0, 0, 1.2, 26, -5, -165)
+
+[node name="Tower_L4" parent="CityTowers" instance=ExtResource("3_build")]
+transform = Transform3D(1.3, 0, 0, 0, 0.8, 0, 0, 0, 1.3, -28, -8, -220)
+
+[node name="Tower_R4" parent="CityTowers" instance=ExtResource("4_dark")]
+transform = Transform3D(1.6, 0, 0, 0, 0.95, 0, 0, 0, 1.6, 32, 5, -240)
+
+[node name="Tower_C2" parent="CityTowers" instance=ExtResource("5_light")]
+transform = Transform3D(0.65, 0, 0, 0, 0.4, 0, 0, 0, 0.65, 0, -20, -280)
+
+[node name="Tower_L5" parent="CityTowers" instance=ExtResource("4_dark")]
+transform = Transform3D(1.4, 0, 0, 0, 0.75, 0, 0, 0, 1.4, -30, -5, -340)
+
+[node name="Tower_R5" parent="CityTowers" instance=ExtResource("3_build")]
+transform = Transform3D(1.3, 0, 0, 0, 0.85, 0, 0, 0, 1.3, 28, 0, -360)
+
+[node name="Tower_L6" parent="CityTowers" instance=ExtResource("5_light")]
+transform = Transform3D(1.5, 0, 0, 0, 0.9, 0, 0, 0, 1.5, -29, 2, -420)
+
+[node name="Tower_R6" parent="CityTowers" instance=ExtResource("4_dark")]
+transform = Transform3D(1.4, 0, 0, 0, 0.7, 0, 0, 0, 1.4, 30, -8, -440)
+
+[node name="Tower_C3" parent="CityTowers" instance=ExtResource("3_build")]
+transform = Transform3D(0.7, 0, 0, 0, 0.45, 0, 0, 0, 0.7, 0, -18, -490)
+
+[node name="Tower_L7" parent="CityTowers" instance=ExtResource("4_dark")]
+transform = Transform3D(1.6, 0, 0, 0, 0.95, 0, 0, 0, 1.6, -32, 5, -550)
+
+[node name="Tower_R7" parent="CityTowers" instance=ExtResource("5_light")]
+transform = Transform3D(1.5, 0, 0, 0, 0.8, 0, 0, 0, 1.5, 30, -5, -570)
+
+[node name="PickupShowcase" type="Node3D" parent="."]
+
+[node name="Trail1_Coin1" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 15, -15)
+
+[node name="Trail1_Coin2" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -25)
+
+[node name="Trail1_Coin3" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 15, -35)
+
+[node name="Trail1_XP" parent="PickupShowcase" instance=ExtResource("7_xp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, -48)
+
+[node name="Trail1_Fuel" parent="PickupShowcase" instance=ExtResource("9_fuel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 15.5, -65)
+
+[node name="Trail1_Powerup" parent="PickupShowcase" instance=ExtResource("10_powerup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, -80)
+
+[node name="Trail2_Coin1" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 15, -95)
+
+[node name="Trail2_Coin2" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 15, -108)
+
+[node name="Trail2_Coin3" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -120)
+
+[node name="Trail2_Health" parent="PickupShowcase" instance=ExtResource("8_health")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 15.5, -132)
+
+[node name="Trail2_Fuel" parent="PickupShowcase" instance=ExtResource("9_fuel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 15.5, -145)
+
+[node name="Trail2_XP" parent="PickupShowcase" instance=ExtResource("7_xp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, -160)
+
+[node name="Trail3_Coin1" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 15, -178)
+
+[node name="Trail3_Coin2" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 15, -190)
+
+[node name="Trail3_Coin3" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -202)
+
+[node name="Trail3_Powerup" parent="PickupShowcase" instance=ExtResource("10_powerup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, -218)
+
+[node name="Trail3_Fuel" parent="PickupShowcase" instance=ExtResource("9_fuel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 15.5, -235)
+
+[node name="Trail4_XP1" parent="PickupShowcase" instance=ExtResource("7_xp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 15.5, -255)
+
+[node name="Trail4_XP2" parent="PickupShowcase" instance=ExtResource("7_xp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 15.5, -255)
+
+[node name="Trail4_Health" parent="PickupShowcase" instance=ExtResource("8_health")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, -275)
+
+[node name="Trail5_Coin1" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 15, -295)
+
+[node name="Trail5_Coin2" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -310)
+
+[node name="Trail5_Coin3" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 15, -325)
+
+[node name="Trail5_Fuel" parent="PickupShowcase" instance=ExtResource("9_fuel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, -345)
+
+[node name="Trail5_Powerup" parent="PickupShowcase" instance=ExtResource("10_powerup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 15.5, -370)
+
+[node name="Trail6_XP" parent="PickupShowcase" instance=ExtResource("7_xp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, -395)
+
+[node name="Trail6_Fuel" parent="PickupShowcase" instance=ExtResource("9_fuel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 15.5, -425)
+
+[node name="Trail6_Health" parent="PickupShowcase" instance=ExtResource("8_health")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 15.5, -460)
+
+[node name="Trail7_Coin1" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -490)
+
+[node name="Trail7_Coin2" parent="PickupShowcase" instance=ExtResource("6_coin")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 15, -510)
+
+[node name="Trail7_Fuel" parent="PickupShowcase" instance=ExtResource("9_fuel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, -535)
+
+[node name="Trail7_Powerup" parent="PickupShowcase" instance=ExtResource("10_powerup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.5, -570)

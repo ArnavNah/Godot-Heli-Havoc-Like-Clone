@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/upgrade_data.gd" id="1_upg"]
+
+[resource]
+script = ExtResource("1_upg")
+id = "boost_power"
+title = "Boost Power"
+icon_text = "⚡"
+card_color = Color(0.15, 0.78, 0.98, 1)
+max_level = 5
+stat_type = "boost_power"
+base_multiplier_per_level = 0.12
+flat_value_per_level = 0.0
+description_template = "+%d%% Max Boost Speed"
