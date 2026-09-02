@@ -7,15 +7,16 @@
 [ext_resource type="PackedScene" path="res://scenes/player/player_helicopter_visual.tscn" id="5_visual"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_col"]
-radius = 1.0
-height = 3.8
+radius = 0.85
+height = 3.0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_crash"]
-size = Vector3(3.2, 2.2, 4.4)
+size = Vector3(2.6, 1.8, 3.4)
 
 [node name="PlayerHeli" type="CharacterBody3D"]
 collision_layer = 1
 collision_mask = 22
+motion_mode = 1
 script = ExtResource("1_heli")
 
 [node name="HealthComponent" type="Node" parent="."]
@@ -35,21 +36,18 @@ shape = SubResource("CapsuleShape3D_col")
 
 [node name="BankingRoot" type="Node3D" parent="VisualYawRoot"]
 
-[node name="MotionJuiceRoot" type="Node3D" parent="VisualYawRoot/BankingRoot"]
+[node name="HoverVisualRoot" type="Node3D" parent="VisualYawRoot/BankingRoot"]
 
-[node name="PlayerHelicopterVisual" parent="VisualYawRoot/BankingRoot/MotionJuiceRoot" instance=ExtResource("5_visual")]
+[node name="PlayerHelicopterVisual" parent="VisualYawRoot/BankingRoot/HoverVisualRoot" instance=ExtResource("5_visual")]
 transform = Transform3D(1.65, 0, 0, 0, 1.65, 0, 0, 0, 1.65, 0, 0, 0)
 
-[node name="WeaponMounts" type="Node3D" parent="VisualYawRoot/BankingRoot/MotionJuiceRoot"]
+[node name="WeaponMounts" type="Node3D" parent="VisualYawRoot/BankingRoot/HoverVisualRoot"]
 
-[node name="LeftGunMuzzle" type="Marker3D" parent="VisualYawRoot/BankingRoot/MotionJuiceRoot/WeaponMounts"]
+[node name="LeftGunMuzzle" type="Marker3D" parent="VisualYawRoot/BankingRoot/HoverVisualRoot/WeaponMounts"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.15, -0.2, -0.8)
 
-[node name="RightGunMuzzle" type="Marker3D" parent="VisualYawRoot/BankingRoot/MotionJuiceRoot/WeaponMounts"]
+[node name="RightGunMuzzle" type="Marker3D" parent="VisualYawRoot/BankingRoot/HoverVisualRoot/WeaponMounts"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.15, -0.2, -0.8)
-
-[node name="CameraTarget" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 14)
 
 [node name="CrashDetector" type="Area3D" parent="."]
 collision_layer = 0

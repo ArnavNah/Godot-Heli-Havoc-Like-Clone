@@ -4,11 +4,11 @@
 [ext_resource type="Material" path="res://resources/materials/enemy_bullet_glow.tres" id="2_mat"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_col"]
-radius = 0.5
+radius = 0.28
 
 [sub_resource type="SphereMesh" id="SphereMesh_vis"]
-radius = 0.35
-height = 0.7
+radius = 0.22
+height = 0.44
 
 [node name="EnemyBullet" type="Area3D"]
 collision_layer = 16

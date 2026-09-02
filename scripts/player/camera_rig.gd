@@ -4,13 +4,13 @@ class_name CameraRig
 @export var target_path: NodePath
 
 @export_group("Decoupled World-Space Camera")
-@export var follow_speed: float = 10.0
+@export var follow_speed: float = 12.0
 @export var pitch_degrees: float = -44.0
 @export var height_offset: float = 8.5
 @export var back_offset: float = 10.0
 @export var base_fov: float = 68.0
-@export var max_fov_kick: float = 5.0
-@export var look_ahead_strength: float = 0.08
+@export var max_fov_kick: float = 4.5
+@export var look_ahead_strength: float = 0.06
 
 @onready var spring_arm: SpringArm3D = $SpringArm3D
 @onready var camera: Camera3D = $SpringArm3D/Camera3D
@@ -20,6 +20,9 @@ var trauma: float = 0.0
 var trauma_time: float = 0.0
 
 func _ready() -> void:
+	# Disable physics interpolation on CameraRig for manual ultra-smooth frame follow
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	
 	if not target_path.is_empty():
 		target = get_node_or_null(target_path)
 	
@@ -54,28 +57,35 @@ func _find_target() -> void:
 func add_shake(amount: float = 0.6) -> void:
 	trauma = clampf(trauma + amount, 0.0, 1.0)
 
-func _physics_process(delta: float) -> void:
+func _process(delta: float) -> void:
 	_find_target()
 	if not target or not is_instance_valid(target):
 		return
 	
-	# Pure world-space follow: does NOT orbit or rotate when helicopter turns
-	var target_pos = target.global_position + Vector3(0, height_offset, back_offset)
+	# Retrieve physics-interpolated target position for stutter-free per-frame camera tracking
+	var target_origin = Vector3.ZERO
+	if target.has_method("get_global_transform_interpolated"):
+		target_origin = target.get_global_transform_interpolated().origin
+	else:
+		target_origin = target.global_position
+	
+	var desired_cam_pos = target_origin + Vector3(0, height_offset, back_offset)
 	var cur_speed = 0.0
+	
 	if target is CharacterBody3D:
 		var cb = target as CharacterBody3D
-		var h_vel = Vector3(cb.velocity.x, 0, cb.velocity.z)
+		var h_vel = Vector3(cb.velocity.x, 0.0, cb.velocity.z)
 		cur_speed = h_vel.length()
-		target_pos += h_vel * look_ahead_strength
+		desired_cam_pos += h_vel * look_ahead_strength
 	
-	# Exponential smoothing follow
+	# Critically damped exponential follow (immediate connection, zero oscillation)
 	var follow_weight = 1.0 - exp(-follow_speed * delta)
-	global_position = global_position.lerp(target_pos, follow_weight)
+	global_position = global_position.lerp(desired_cam_pos, follow_weight)
 	
-	# Fixed downward pitch
+	# Strictly fixed high arcade pitch (camera does NOT chase helicopter yaw or roll)
 	rotation_degrees = Vector3(pitch_degrees, 0.0, 0.0)
 	
-	# Trauma Screen Shake
+	# Screen Shake Trauma
 	if trauma > 0.0:
 		trauma_time += delta * 25.0
 		var shake_amount = trauma * trauma
@@ -87,7 +97,7 @@ func _physics_process(delta: float) -> void:
 			spring_arm.position = Vector3(offset_x, offset_y, 0)
 			spring_arm.rotation.z = offset_rot
 		
-		trauma = maxf(0.0, trauma - delta * 1.5)
+		trauma = maxf(0.0, trauma - delta * 1.6)
 	else:
 		if spring_arm:
 			spring_arm.position = Vector3.ZERO
@@ -95,5 +105,5 @@ func _physics_process(delta: float) -> void:
 	
 	# Dynamic speed FOV kick
 	if camera:
-		var target_fov = base_fov + clampf(cur_speed / 30.0, 0.0, 1.0) * max_fov_kick
+		var target_fov = base_fov + clampf(cur_speed / 27.0, 0.0, 1.0) * max_fov_kick
 		camera.fov = lerpf(camera.fov, target_fov, 1.0 - exp(-8.0 * delta))

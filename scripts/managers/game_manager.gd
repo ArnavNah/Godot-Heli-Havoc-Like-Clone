@@ -193,9 +193,8 @@ func _update_player_stats() -> void:
 			var fire_mult = get_stat_multiplier("fire_rate")
 			var fuel_mult = get_stat_multiplier("max_fuel")
 			var fuel_eff = get_stat_multiplier("fuel_efficiency")
-			
-			p.horizontal_speed = 30.0 * speed_mult
-			p.acceleration = 110.0 * get_stat_multiplier("acceleration")
+			p.max_speed = 27.0 * speed_mult
+			p.forward_acceleration = 48.0 * get_stat_multiplier("acceleration")
 			p.fire_cooldown = 0.11 / maxf(1.0, fire_mult)
 			
 			if p.fuel_component:
