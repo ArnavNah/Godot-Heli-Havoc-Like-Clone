@@ -1,0 +1,65 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/effects/explosion_effect.gd" id="1_exp"]
+[ext_resource type="Material" path="res://resources/materials/explosion_fire.tres" id="2_fire_mat"]
+[ext_resource type="Material" path="res://resources/materials/explosion_smoke.tres" id="3_smoke_mat"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_spark"]
+size = Vector3(0.35, 0.35, 0.35)
+
+[sub_resource type="SphereMesh" id="SphereMesh_smoke"]
+radius = 0.5
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shock"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.85, 0.3, 0.9)
+
+[sub_resource type="SphereMesh" id="SphereMesh_shock"]
+material = SubResource("StandardMaterial3D_shock")
+radius = 1.0
+height = 2.0
+
+[node name="ExplosionEffect" type="Node3D"]
+script = ExtResource("1_exp")
+
+[node name="FireParticles" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 26
+lifetime = 0.8
+one_shot = true
+explosiveness = 0.95
+mesh = SubResource("BoxMesh_spark")
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, -9.8, 0)
+initial_velocity_min = 12.0
+initial_velocity_max = 24.0
+scale_amount_min = 0.4
+scale_amount_max = 1.0
+material_override = ExtResource("2_fire_mat")
+
+[node name="SmokeParticles" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 16
+lifetime = 1.1
+one_shot = true
+explosiveness = 0.9
+mesh = SubResource("SphereMesh_smoke")
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, 1.0, 0)
+initial_velocity_min = 3.0
+initial_velocity_max = 9.0
+scale_amount_min = 0.6
+scale_amount_max = 1.4
+material_override = ExtResource("3_smoke_mat")
+
+[node name="FlashLight" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.65, 0.15, 1)
+light_energy = 5.0
+omni_range = 22.0
+
+[node name="ShockwaveMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_shock")

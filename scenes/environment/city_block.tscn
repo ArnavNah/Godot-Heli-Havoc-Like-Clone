@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/environment/city_block.gd" id="1_cblock"]
+
+[node name="CityBlock" type="Node3D"]
+script = ExtResource("1_cblock")
+
+[node name="Buildings" type="Node3D" parent="."]
+
+[node name="Dynamic" type="Node3D" parent="."]

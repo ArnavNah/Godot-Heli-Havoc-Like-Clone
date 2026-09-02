@@ -14,12 +14,11 @@ transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 
 [node name="BodyModel" parent="BodyRoot" unique_id=786650212 instance=ExtResource("2_body")]
 
 [node name="MainRotorPivot" type="Node3D" parent="." unique_id=2132266352]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.435, -0.29)
 
 [node name="TopPropeller" parent="MainRotorPivot" unique_id=588615624 instance=ExtResource("3_top")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07404095, -0.3031361)
 
 [node name="TailRotorPivot" type="Node3D" parent="." unique_id=1459877269]
-transform = Transform3D(-1.39876e-08, 0, -0.32, 0, 0.32, 0, 0.32, 0, -1.39876e-08, 0.08, 0.16, 0.94)
+transform = Transform3D(-1.39876e-08, 0, -0.32, 0, 0.32, 0, 0.32, 0, -1.39876e-08, 0.1, 0.037, 0.86)
 
 [node name="BackPropeller" parent="TailRotorPivot" unique_id=334651124 instance=ExtResource("4_back")]

@@ -1,67 +1,72 @@
 extends Area3D
 class_name GoldPickup
 
-signal collected(value: int)
-
-@export var value: int = 1
-@export var magnet_radius: float = 4.5
-@export var magnet_speed: float = 22.0
-@export var rotation_speed: float = 4.0
+@export var gold_value: int = 1
+@export var magnet_radius: float = 3.5
+@export var magnet_speed: float = 28.0
+@export var bob_amplitude: float = 0.25
 @export var bob_speed: float = 3.5
-@export var bob_height: float = 0.25
+@export var spin_speed: float = 4.0
 
-@onready var visual_root: Node3D = $VisualRoot
+@onready var visual_node: Node3D = $VisualRoot
 
-var is_collected: bool = false
+var initial_y: float = 0.0
 var time_elapsed: float = 0.0
 var target_player: Node3D = null
+var is_collected: bool = false
 
 func _ready() -> void:
 	# Layer 6: Pickup (32), Mask 1: Player (1)
 	collision_layer = 32
 	collision_mask = 1
+	initial_y = position.y
+	time_elapsed = randf() * 5.0
+	
 	body_entered.connect(_on_body_entered)
+	area_entered.connect(_on_area_entered)
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if is_collected:
 		return
 	
 	time_elapsed += delta
-	if visual_root:
-		visual_root.rotate_y(rotation_speed * delta)
-		visual_root.position.y = sin(time_elapsed * bob_speed) * bob_height
 	
-	_handle_magnet(delta)
-
-func _handle_magnet(delta: float) -> void:
+	# Find player if not tracked
 	if not target_player or not is_instance_valid(target_player):
-		var players = get_tree().get_nodes_in_group("player")
-		if players.size() > 0:
+		var players = get_tree().get_nodes_in_group("PlayerHeli")
+		if players.is_empty():
+			players = get_tree().get_nodes_in_group("player")
+		if not players.is_empty():
 			target_player = players[0]
-		else:
-			return
 	
-	var effective_radius = magnet_radius
-	if GameManager:
-		effective_radius *= GameManager.get_stat_multiplier("magnet_radius")
+	# Magnet pull
+	if target_player and is_instance_valid(target_player):
+		var dist = global_position.distance_to(target_player.global_position)
+		if dist <= magnet_radius:
+			var dir = (target_player.global_position - global_position).normalized()
+			global_position += dir * magnet_speed * delta
+			if dist < 1.0:
+				collect()
+				return
 	
-	var dist = global_position.distance_to(target_player.global_position)
-	if dist <= effective_radius:
-		global_position = global_position.move_toward(target_player.global_position, magnet_speed * delta)
+	# Visual bob & spin
+	if visual_node:
+		visual_node.rotation.y += spin_speed * delta
+		visual_node.position.y = sin(time_elapsed * bob_speed) * bob_amplitude
 
 func _on_body_entered(body: Node3D) -> void:
+	if (body.collision_layer & 1) != 0 or body.is_in_group("player") or body.is_in_group("PlayerHeli"):
+		collect()
+
+func _on_area_entered(_area: Area3D) -> void:
+	collect()
+
+func collect() -> void:
 	if is_collected:
 		return
-	if body.is_in_group("player") or body.is_in_group("PlayerHeli") or (body.collision_layer & 1) != 0:
-		_collect()
-
-func _collect() -> void:
 	is_collected = true
-	var actual_value = value
-	if GameManager:
-		var mult = GameManager.get_stat_multiplier("gold_value")
-		actual_value = int(value * mult)
-		GameManager.add_gold(actual_value)
 	
-	collected.emit(actual_value)
+	if GameManager:
+		GameManager.add_gold(gold_value)
+	
 	queue_free()

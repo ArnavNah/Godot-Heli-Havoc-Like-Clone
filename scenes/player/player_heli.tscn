@@ -7,8 +7,11 @@
 [ext_resource type="PackedScene" path="res://scenes/player/player_helicopter_visual.tscn" id="5_visual"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_col"]
-radius = 1.3
-height = 4.8
+radius = 1.0
+height = 3.8
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_crash"]
+size = Vector3(3.2, 2.2, 4.4)
 
 [node name="PlayerHeli" type="CharacterBody3D"]
 collision_layer = 1
@@ -28,12 +31,29 @@ script = ExtResource("4_prog")
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_col")
 
-[node name="MuzzleRayCast" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.0)
-target_position = Vector3(0, 0, -35)
-collision_mask = 4
+[node name="VisualYawRoot" type="Node3D" parent="."]
 
-[node name="VisualRoot" type="Node3D" parent="."]
+[node name="BankingRoot" type="Node3D" parent="VisualYawRoot"]
 
-[node name="PlayerHelicopterVisual" parent="VisualRoot" instance=ExtResource("5_visual")]
+[node name="MotionJuiceRoot" type="Node3D" parent="VisualYawRoot/BankingRoot"]
+
+[node name="PlayerHelicopterVisual" parent="VisualYawRoot/BankingRoot/MotionJuiceRoot" instance=ExtResource("5_visual")]
 transform = Transform3D(1.65, 0, 0, 0, 1.65, 0, 0, 0, 1.65, 0, 0, 0)
+
+[node name="WeaponMounts" type="Node3D" parent="VisualYawRoot/BankingRoot/MotionJuiceRoot"]
+
+[node name="LeftGunMuzzle" type="Marker3D" parent="VisualYawRoot/BankingRoot/MotionJuiceRoot/WeaponMounts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.15, -0.2, -0.8)
+
+[node name="RightGunMuzzle" type="Marker3D" parent="VisualYawRoot/BankingRoot/MotionJuiceRoot/WeaponMounts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.15, -0.2, -0.8)
+
+[node name="CameraTarget" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 14)
+
+[node name="CrashDetector" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CrashDetector"]
+shape = SubResource("BoxShape3D_crash")

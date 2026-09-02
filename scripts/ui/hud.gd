@@ -20,6 +20,7 @@ class_name GameHUD
 
 @onready var center_banner: Label = $CenterBanner
 @onready var banner_anim: AnimationPlayer = $CenterBanner/AnimationPlayer
+@onready var mobile_controls: HeliMobileControls = get_node_or_null("MobileControls")
 
 var elapsed_time: float = 0.0
 var initial_player_z: float = 0.0
@@ -56,6 +57,9 @@ func _find_player() -> void:
 	if not players.is_empty():
 		target_player = players[0]
 		initial_player_z = target_player.global_position.z
+		if mobile_controls and mobile_controls.virtual_joystick and target_player.has_method("update_input"):
+			if not mobile_controls.virtual_joystick.joystick_updated.is_connected(target_player.update_input):
+				mobile_controls.virtual_joystick.joystick_updated.connect(target_player.update_input)
 
 func _process(delta: float) -> void:
 	elapsed_time += delta

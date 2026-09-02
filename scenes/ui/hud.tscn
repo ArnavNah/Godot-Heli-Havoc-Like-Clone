@@ -1,6 +1,7 @@
 [gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/mobile_controls.tscn" id="2_mob"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_top_left"]
 font_size = 20
@@ -508,3 +509,5 @@ vertical_alignment = 1
 libraries = {
 "": SubResource("AnimationLibrary_banner")
 }
+
+[node name="MobileControls" parent="." instance=ExtResource("2_mob")]

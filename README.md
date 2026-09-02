@@ -16,14 +16,13 @@ Fly freely in 360 degrees through a floating low-poly arena made of chunky geome
 
 | Input | Action |
 | :--- | :--- |
-| **W** | Move Screen/Camera Forward |
-| **S** | Move Screen/Camera Backward |
-| **A** | Move Screen/Camera Left |
-| **D** | Move Screen/Camera Right |
-| **W + A / W + D / S + A / S + D** | Instant 360° Diagonal Movement |
-| **Left Click / Spacebar** | Continuous Dual Blaster Fire |
-| **Virtual Joystick** | Mobile touch 360° analog steering |
-| **FIRE Button** | Mobile weapon trigger |
+| **W / A / S / D** | 360° Horizontal Flight (Screen/Camera-relative) |
+| **Virtual Joystick** | 360° Touch Analog Steering |
+| **Left Click / J / Enter** | Continuous Dual Blaster Fire |
+| **🔥 FIRE Button** | Mobile continuous weapon trigger |
+| **Spacebar / Up Arrow** | Rotor lift (Fly Up / Gain Altitude) |
+| **⬆ FLY Button** | Mobile rotor lift trigger |
+| **⬇ DIVE Button / Ctrl** | Fast descent (Dive / Lower Altitude) |
 
 ---
 

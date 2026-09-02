@@ -13,7 +13,9 @@ signal level_up_requested(choices: Array)
 
 var gold: int = 0
 var score: int = 0
+var high_score: int = 0
 var kills: int = 0
+var gold_multiplier: int = 1
 
 var level: int = 1
 var current_xp: int = 0
@@ -60,6 +62,7 @@ func reset() -> void:
 	gold = 0
 	score = 0
 	kills = 0
+	gold_multiplier = 1
 	
 	level = 1
 	current_xp = 0
@@ -104,9 +107,11 @@ func get_stat_flat_value(stat_type: String) -> float:
 
 func add_gold(amount: int = 1) -> void:
 	var coin_mult = get_stat_multiplier("coin_value")
-	var total = int(amount * coin_mult)
+	var total = int(amount * coin_mult * gold_multiplier)
 	gold += total
 	score += total * 10
+	if score > high_score:
+		high_score = score
 	gold_changed.emit(gold)
 	score_changed.emit(score)
 
@@ -115,6 +120,8 @@ func add_xp(amount: int = 1) -> void:
 	var total_xp = int(amount * xp_mult)
 	current_xp += total_xp
 	score += total_xp * 25
+	if score > high_score:
+		high_score = score
 	score_changed.emit(score)
 	
 	# Check for level up threshold
@@ -187,9 +194,9 @@ func _update_player_stats() -> void:
 			var fuel_mult = get_stat_multiplier("max_fuel")
 			var fuel_eff = get_stat_multiplier("fuel_efficiency")
 			
-			p.max_speed = 26.0 * speed_mult
-			p.acceleration = 95.0 * get_stat_multiplier("acceleration")
-			p.fire_cooldown = 0.2 / maxf(1.0, fire_mult)
+			p.horizontal_speed = 30.0 * speed_mult
+			p.acceleration = 110.0 * get_stat_multiplier("acceleration")
+			p.fire_cooldown = 0.11 / maxf(1.0, fire_mult)
 			
 			if p.fuel_component:
 				p.fuel_component.set_max_fuel(100.0 * fuel_mult)
@@ -218,6 +225,10 @@ func add_boost(amount: float = 35.0) -> void:
 	boost = minf(boost + amount, max_boost)
 	boost_changed.emit(boost, max_boost)
 	notification_triggered.emit("+BOOST RECHARGED!")
+
+func use_boost(amount: float) -> void:
+	boost = maxf(0.0, boost - amount)
+	boost_changed.emit(boost, max_boost)
 
 func add_powerup(powerup_name: String = "FIREPOWER") -> void:
 	score += 200

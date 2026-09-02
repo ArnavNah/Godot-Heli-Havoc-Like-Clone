@@ -1,0 +1,215 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/mobile_controls.gd" id="1_mob"]
+[ext_resource type="PackedScene" path="res://scenes/ui/virtual_joystick.tscn" id="2_joy"]
+[ext_resource type="Script" path="res://scripts/ui/touch_button.gd" id="3_btn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fire"]
+bg_color = Color(0.9, 0.2, 0.15, 0.75)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.65, 0.2, 0.95)
+corner_radius_top_left = 42
+corner_radius_top_right = 42
+corner_radius_bottom_right = 42
+corner_radius_bottom_left = 42
+shadow_color = Color(0.85, 0.15, 0.1, 0.45)
+shadow_size = 6
+
+[sub_resource type="LabelSettings" id="LabelSettings_fire"]
+font_size = 16
+font_color = Color(1, 1, 1, 1)
+outline_size = 4
+outline_color = Color(0.2, 0.02, 0.02, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fly_up"]
+bg_color = Color(0.1, 0.58, 0.92, 0.75)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.9, 1, 0.95)
+corner_radius_top_left = 35
+corner_radius_top_right = 35
+corner_radius_bottom_right = 35
+corner_radius_bottom_left = 35
+shadow_color = Color(0.1, 0.5, 0.9, 0.4)
+shadow_size = 5
+
+[sub_resource type="LabelSettings" id="LabelSettings_fly_up"]
+font_size = 14
+font_color = Color(1, 1, 1, 1)
+outline_size = 4
+outline_color = Color(0.02, 0.12, 0.25, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fly_down"]
+bg_color = Color(0.18, 0.32, 0.65, 0.75)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.75, 1, 0.85)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+shadow_color = Color(0.05, 0.1, 0.3, 0.4)
+shadow_size = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_fly_down"]
+font_size = 13
+font_color = Color(1, 1, 1, 1)
+outline_size = 3
+outline_color = Color(0.02, 0.05, 0.15, 1)
+
+[node name="MobileControls" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_mob")
+
+[node name="VirtualJoystick" parent="." instance=ExtResource("2_joy")]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 35.0
+offset_top = -185.0
+offset_right = 185.0
+offset_bottom = -35.0
+grow_vertical = 0
+
+[node name="ActionCluster" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -230.0
+offset_top = -220.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="FireButton" type="Control" parent="ActionCluster"]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -92.0
+offset_top = -92.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("3_btn")
+action_name = "shoot"
+
+[node name="Panel" type="Panel" parent="ActionCluster/FireButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fire")
+
+[node name="Label" type="Label" parent="ActionCluster/FireButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "🔥
+FIRE"
+label_settings = SubResource("LabelSettings_fire")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FlyUpButton" type="Control" parent="ActionCluster"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -84.0
+offset_top = 10.0
+offset_right = -14.0
+offset_bottom = 80.0
+grow_horizontal = 0
+script = ExtResource("3_btn")
+action_name = "fly_up"
+
+[node name="Panel" type="Panel" parent="ActionCluster/FlyUpButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fly_up")
+
+[node name="Label" type="Label" parent="ActionCluster/FlyUpButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "⬆
+FLY"
+label_settings = SubResource("LabelSettings_fly_up")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FlyDownButton" type="Control" parent="ActionCluster"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = -78.0
+offset_right = 78.0
+offset_bottom = -18.0
+grow_vertical = 0
+script = ExtResource("3_btn")
+action_name = "fly_down"
+
+[node name="Panel" type="Panel" parent="ActionCluster/FlyDownButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fly_down")
+
+[node name="Label" type="Label" parent="ActionCluster/FlyDownButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "⬇
+DIVE"
+label_settings = SubResource("LabelSettings_fly_down")
+horizontal_alignment = 1
+vertical_alignment = 1

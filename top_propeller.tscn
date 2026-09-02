@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://tukaxm2w3k51"]
+
+[ext_resource type="PackedScene" uid="uid://6rj0uvs8mr4r" path="res://Player model/top propeller.glb" id="1_ntd4s"]
+
+[node name="top propeller" unique_id=1187141557 instance=ExtResource("1_ntd4s")]

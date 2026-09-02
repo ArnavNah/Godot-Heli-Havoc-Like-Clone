@@ -1,0 +1,88 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/effects/muzzle_flash.gd" id="1_flash"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glow"]
+shading_mode = 0
+albedo_color = Color(1, 0.98, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_core"]
+material = SubResource("StandardMaterial3D_glow")
+radius = 0.22
+height = 0.44
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_streak"]
+blend_mode = 1
+shading_mode = 0
+billboard_mode = 1
+albedo_color = Color(1, 0.85, 0.3, 0.95)
+
+[sub_resource type="QuadMesh" id="QuadMesh_streak"]
+material = SubResource("StandardMaterial3D_streak")
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_star"]
+blend_mode = 1
+shading_mode = 0
+billboard_mode = 1
+albedo_color = Color(1, 0.65, 0.15, 0.9)
+
+[sub_resource type="QuadMesh" id="QuadMesh_star"]
+material = SubResource("StandardMaterial3D_star")
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 0.75, 0.2, 0.8)
+
+[sub_resource type="TorusMesh" id="TorusMesh_ring"]
+material = SubResource("StandardMaterial3D_ring")
+inner_radius = 0.3
+outer_radius = 0.42
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
+shading_mode = 0
+albedo_color = Color(1, 0.9, 0.4, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_spark"]
+material = SubResource("StandardMaterial3D_spark")
+size = Vector3(0.08, 0.08, 0.25)
+
+[node name="MuzzleFlash" type="Node3D"]
+script = ExtResource("1_flash")
+
+[node name="FlashMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_core")
+
+[node name="StreakFlare" type="MeshInstance3D" parent="."]
+mesh = SubResource("QuadMesh_streak")
+
+[node name="StarFlare" type="MeshInstance3D" parent="."]
+mesh = SubResource("QuadMesh_star")
+
+[node name="RingFlare" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("TorusMesh_ring")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.85, 0.3, 1)
+light_energy = 4.2
+omni_range = 7.5
+omni_attenuation = 1.4
+
+[node name="CPUParticles3D" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 8
+lifetime = 0.08
+one_shot = true
+explosiveness = 0.95
+mesh = SubResource("BoxMesh_spark")
+direction = Vector3(0, 0, -1)
+spread = 22.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 14.0
+initial_velocity_max = 28.0
+scale_amount_min = 0.5
+scale_amount_max = 1.1
+
