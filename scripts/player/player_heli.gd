@@ -18,20 +18,22 @@ const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 @export var coast_deceleration: float = 38.0
 
 @export_group("2. Vertical Lift & Descent")
-@export var max_rise_speed: float = 9.0
-@export var max_fall_speed: float = 6.5
-@export var lift_acceleration: float = 18.0
-@export var sink_acceleration: float = 10.0
+@export var max_rise_speed: float = 8.5
+@export var max_fall_speed: float = 2.4
+@export var dive_speed: float = 4.0
+@export var neutral_sink_speed: float = 0.6
+@export var lift_acceleration: float = 16.0
+@export var sink_acceleration: float = 4.2
 
 @export_group("3. Visual Yaw & Heading")
-@export var yaw_speed: float = 7.0 # rad/sec
+@export var yaw_speed: float = 7.5 # rad/sec
 @export var min_yaw_velocity_threshold: float = 0.35 # m/s
 
 @export_group("4. Visual Banking & Pitch")
-@export var max_roll_deg: float = 32.0
-@export var max_pitch_deg: float = 12.0
-@export var bank_enter_response: float = 12.0
-@export var bank_return_response: float = 7.5
+@export var max_roll_deg: float = 34.0
+@export var max_pitch_deg: float = 14.0
+@export var bank_enter_response: float = 18.0
+@export var bank_return_response: float = 9.5
 
 @export_group("5. Cosmetic Hover Feel")
 @export var cosmetic_bob_amplitude: float = 0.16
@@ -299,11 +301,12 @@ func _physics_process(delta: float) -> void:
 		vertical_velocity = move_toward(vertical_velocity, max_rise_speed, lift_acceleration * delta)
 		_drain_fuel(lift_fuel_drain_rate * delta)
 	elif wants_descend:
-		vertical_velocity = move_toward(vertical_velocity, -max_fall_speed * 1.4, sink_acceleration * 1.8 * delta)
+		# Controlled descent without plunging
+		vertical_velocity = move_toward(vertical_velocity, -dive_speed, sink_acceleration * 1.5 * delta)
 		_drain_fuel(base_fuel_drain_rate * delta)
 	else:
-		# Buoyant continuous descent through 0
-		vertical_velocity = move_toward(vertical_velocity, -max_fall_speed, sink_acceleration * delta)
+		# Buoyant continuous float with very gentle settling
+		vertical_velocity = move_toward(vertical_velocity, -neutral_sink_speed, sink_acceleration * delta)
 		_drain_fuel(base_fuel_drain_rate * delta)
 	
 	# 4. Construct Authoritative Velocity & Execute Floating Physics Slide
@@ -357,19 +360,24 @@ func _apply_visual_presentation(cam_right: Vector3, cam_forward: Vector3, delta:
 		var h_accel = (horizontal_velocity - _prev_horizontal_velocity) / maxf(0.0001, delta)
 		_prev_horizontal_velocity = horizontal_velocity
 		
-		# Project acceleration onto screen-relative axes
+		# Project velocity and acceleration onto screen-relative axes
+		var screen_vx = horizontal_velocity.dot(cam_right) / max_speed
+		var screen_vz = horizontal_velocity.dot(cam_forward) / max_speed
+		
 		var screen_accel_x = h_accel.dot(cam_right)
 		var screen_accel_z = h_accel.dot(cam_forward)
 		
-		# Roll: Strong bank during turns/dodges, relaxing during steady straight travel
-		var accel_roll = -clamp(screen_accel_x / 42.0, -1.0, 1.0) * deg_to_rad(max_roll_deg)
-		var steady_roll = -clamp(horizontal_velocity.dot(cam_right) / max_speed, -1.0, 1.0) * deg_to_rad(max_roll_deg * 0.22)
-		var target_roll = clamp(accel_roll + steady_roll, -deg_to_rad(max_roll_deg), deg_to_rad(max_roll_deg))
+		# Quick smooth tilt: direct velocity bank + snappy acceleration kick into turns
+		var direct_roll = -clamp(screen_vx, -1.0, 1.0) * deg_to_rad(max_roll_deg * 0.72)
+		var accel_roll = -clamp(screen_accel_x / 28.0, -1.0, 1.0) * deg_to_rad(max_roll_deg * 0.48)
+		var target_roll = clamp(direct_roll + accel_roll, -deg_to_rad(max_roll_deg), deg_to_rad(max_roll_deg))
 		
-		# Pitch: Forward acceleration digs nose down, braking/reversing raises nose
-		var target_pitch = -clamp(screen_accel_z / 38.0, -1.0, 1.0) * deg_to_rad(max_pitch_deg)
+		# Pitch: Forward velocity dips nose down, braking/reversing pitches up
+		var direct_pitch = -clamp(screen_vz, -1.0, 1.0) * deg_to_rad(max_pitch_deg * 0.65)
+		var accel_pitch = -clamp(screen_accel_z / 25.0, -1.0, 1.0) * deg_to_rad(max_pitch_deg * 0.5)
+		var target_pitch = clamp(direct_pitch + accel_pitch, -deg_to_rad(max_pitch_deg), deg_to_rad(max_pitch_deg))
 		
-		# Asymmetric frame-rate independent exponential smoothing (snappy enter, smooth return)
+		# Asymmetric fast exponential smoothing (quick enter, buttery return)
 		var cur_roll = banking_root.rotation.z
 		var cur_pitch = banking_root.rotation.x
 		

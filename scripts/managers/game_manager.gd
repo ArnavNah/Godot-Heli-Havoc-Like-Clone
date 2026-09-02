@@ -74,6 +74,8 @@ func reset() -> void:
 	max_boost = 100.0
 	
 	upgrade_levels.clear()
+	pending_level_ups = 0
+	is_leveling_up = false
 	
 	gold_changed.emit(gold)
 	xp_updated.emit(current_xp, xp_required, level)
@@ -105,6 +107,9 @@ func get_stat_flat_value(stat_type: String) -> float:
 				total += flat * lvl
 	return total
 
+var pending_level_ups: int = 0
+var is_leveling_up: bool = false
+
 func add_gold(amount: int = 1) -> void:
 	var coin_mult = get_stat_multiplier("coin_value")
 	var total = int(amount * coin_mult * gold_multiplier)
@@ -124,14 +129,17 @@ func add_xp(amount: int = 1) -> void:
 		high_score = score
 	score_changed.emit(score)
 	
-	# Check for level up threshold
-	if current_xp >= xp_required:
+	# Check for level up threshold (support multi-level pickups)
+	while current_xp >= xp_required:
 		current_xp -= xp_required
 		level += 1
 		xp_required = int(xp_required * 1.35) + 8
-		_trigger_level_up()
+		pending_level_ups += 1
 	
 	xp_updated.emit(current_xp, xp_required, level)
+	
+	if pending_level_ups > 0 and not is_leveling_up:
+		_trigger_level_up()
 
 func _trigger_level_up() -> void:
 	# Filter available upgrades not yet maxed out
@@ -142,6 +150,12 @@ func _trigger_level_up() -> void:
 		if curr_lvl < max_lvl:
 			available.append(upg)
 	
+	if available.is_empty():
+		pending_level_ups = 0
+		is_leveling_up = false
+		return
+	
+	is_leveling_up = true
 	available.shuffle()
 	var choices: Array = []
 	for i in range(mini(3, available.size())):
@@ -181,6 +195,12 @@ func apply_upgrade(upgrade_resource: Resource) -> void:
 	if upgrade_resource.has_method("get_title_for_level"):
 		title = upgrade_resource.get_title_for_level(new_lvl)
 	notification_triggered.emit("%s UNLOCKED!" % title.to_upper())
+	
+	pending_level_ups = max(0, pending_level_ups - 1)
+	is_leveling_up = false
+	
+	if pending_level_ups > 0:
+		_trigger_level_up()
 
 func _update_player_stats() -> void:
 	var players = get_tree().get_nodes_in_group("PlayerHeli")

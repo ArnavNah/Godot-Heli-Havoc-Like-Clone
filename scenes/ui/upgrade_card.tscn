@@ -38,6 +38,7 @@ outline_size = 3
 outline_color = Color(0.05, 0.05, 0.1, 1)
 
 [node name="UpgradeCard" type="Button"]
+process_mode = 3
 custom_minimum_size = Vector2(220, 290)
 theme_override_styles/normal = SubResource("StyleBoxFlat_normal")
 script = ExtResource("1_card")

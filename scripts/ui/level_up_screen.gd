@@ -36,10 +36,10 @@ func _on_level_up_requested(choices: Array) -> void:
 			card.upgrade_selected.connect(_on_card_selected)
 
 func _on_card_selected(upgrade: Resource) -> void:
-	# 1. Apply upgrade
 	if GameManager:
 		GameManager.apply_upgrade(upgrade)
+		if GameManager.get("pending_level_ups") != null and GameManager.pending_level_ups > 0:
+			return
 	
-	# 2. Resume gameplay
 	visible = false
 	get_tree().paused = false
