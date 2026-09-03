@@ -58,16 +58,19 @@ func _handle_magnet(delta: float) -> void:
 	
 	var dist = global_position.distance_to(target_player.global_position)
 	if dist <= effective_radius:
+		if dist <= 1.0:
+			_collect(target_player)
+			return
 		global_position = global_position.move_toward(target_player.global_position, magnet_speed * delta)
 
 func _on_body_entered(body: Node3D) -> void:
 	if is_collected:
 		return
 	
-	if body is CharacterBody3D or body.is_in_group("player") or (body.collision_layer & 2) != 0:
-		_collect()
+	if body is CharacterBody3D or body.is_in_group("player") or body.is_in_group("PlayerHeli") or (body.collision_layer & 3) != 0:
+		_collect(body)
 
-func _collect() -> void:
+func _collect(collector: Node3D = null) -> void:
 	is_collected = true
 	var spawn_pos = global_position
 	
@@ -79,9 +82,15 @@ func _collect() -> void:
 			PickupType.XP:
 				GameManager.add_xp(value)
 			PickupType.HEALTH:
-				GameManager.add_health(value)
+				if collector and collector.has_method("add_health"):
+					collector.add_health(value)
+				else:
+					GameManager.add_health(value)
 			PickupType.BOOST:
-				GameManager.add_boost(float(value))
+				if collector and collector.has_method("add_fuel"):
+					collector.add_fuel(float(value))
+				else:
+					GameManager.add_boost(float(value))
 			PickupType.POWERUP:
 				GameManager.add_powerup("FIREPOWER")
 	

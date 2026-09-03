@@ -13,9 +13,10 @@ const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 
 @export_group("1. Mass & Lift Forces")
 @export var mass_kg: float = 60.0
-@export var base_lift_ratio: float = 0.98 # Nearly counters gravity for a gentle neutral descent
+@export var base_lift_ratio: float = 0.90 # Leaves enough uncompensated weight for a visible neutral descent
 @export var collective_strength: float = 1.65 # Climb thrust multiplier when holding Space
-@export var altitude_assist_strength: float = 140.0 # Sticky collective dampening during hover
+@export var neutral_descent_speed: float = 1.35 # Automatic sink rate whenever lift is released
+@export var altitude_assist_strength: float = 70.0 # Force response toward the neutral sink rate
 @export var dive_lift_ratio: float = 0.25 # Thrust reduction when actively holding descend
 
 @export_group("2. Horizontal Propulsion & Drag")
@@ -317,11 +318,13 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var total_lift = weight * lift_mult
 	state.apply_central_force(local_up * total_lift)
 	
-	# Altitude assist / sticky collective near hover
+	# Releasing collective always produces an intentional, controlled sink. This
+	# remains active during horizontal flight and uses force rather than teleporting.
 	if not wants_lift and not wants_descend:
-		if abs(state.linear_velocity.y) < 2.0:
-			var alt_assist = -state.linear_velocity.y * altitude_assist_strength
-			state.apply_central_force(Vector3.UP * alt_assist)
+		var target_vertical_velocity = -neutral_descent_speed
+		var descent_error = target_vertical_velocity - state.linear_velocity.y
+		var descent_assist = descent_error * altitude_assist_strength
+		state.apply_central_force(Vector3.UP * descent_assist)
 	
 	# Cap maximum vertical rise & fall speed
 	state.linear_velocity.y = clampf(state.linear_velocity.y, -max_fall_speed, max_rise_speed)
@@ -416,6 +419,39 @@ func heal(amount: int) -> void:
 	elif GameManager:
 		GameManager.health = mini(GameManager.max_health, GameManager.health + amount)
 		GameManager.health_changed.emit(GameManager.health, GameManager.max_health)
+
+# Pickup compatibility lives on the active physics player so rewards update the
+# authoritative components instead of only changing their mirrored HUD values.
+func add_health(amount: int = 25) -> void:
+	heal(amount)
+
+func add_fuel(amount: float = 35.0) -> void:
+	if fuel_component and fuel_component.has_method("add_fuel"):
+		fuel_component.add_fuel(amount)
+	elif GameManager:
+		GameManager.add_boost(amount)
+
+func apply_powerup(powerup_name: String, duration: float) -> void:
+	match powerup_name:
+		"INSTAKILL":
+			instakill_timer = maxf(instakill_timer, duration)
+			if GameManager:
+				GameManager.notification_triggered.emit("INSTAKILL ACTIVE (%ds)!" % int(duration))
+		"DOUBLE_COINS", "DOUBLE_COIN":
+			double_coins_timer = maxf(double_coins_timer, duration)
+			if GameManager:
+				GameManager.gold_multiplier = 2
+				GameManager.notification_triggered.emit("2X COINS ACTIVE (%ds)!" % int(duration))
+		"NUKE":
+			for enemy in get_tree().get_nodes_in_group("enemies"):
+				if not is_instance_valid(enemy):
+					continue
+				if enemy.has_method("destroy_turret"):
+					enemy.destroy_turret()
+				else:
+					enemy.queue_free()
+			if GameManager:
+				GameManager.notification_triggered.emit("NUKE DETONATED! ALL ENEMIES DESTROYED!")
 
 func shoot() -> void:
 	if not bullet_scene:
