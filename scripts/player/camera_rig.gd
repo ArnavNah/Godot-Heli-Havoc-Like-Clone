@@ -5,10 +5,10 @@ class_name CameraRig
 
 @export_group("Decoupled World-Space Camera")
 @export var follow_speed: float = 12.0
-@export var pitch_degrees: float = -18.0
-@export var height_offset: float = 4.2
-@export var back_offset: float = 7.8
-@export var base_fov: float = 64.0
+@export var pitch_degrees: float = -20.0
+@export var height_offset: float = 4.8
+@export var back_offset: float = 9.4
+@export var base_fov: float = 66.0
 @export var max_fov_kick: float = 4.5
 @export var look_ahead_strength: float = 0.06
 

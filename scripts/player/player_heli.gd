@@ -13,29 +13,28 @@ const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 
 @export_group("1. Mass & Lift Forces")
 @export var mass_kg: float = 60.0
-@export var base_lift_ratio: float = 0.92 # Fraction of gravity countered at neutral (gentle sinking)
-@export var collective_strength: float = 1.70 # Climb thrust multiplier when holding Space
+@export var base_lift_ratio: float = 0.98 # Nearly counters gravity for a gentle neutral descent
+@export var collective_strength: float = 1.65 # Climb thrust multiplier when holding Space
 @export var altitude_assist_strength: float = 140.0 # Sticky collective dampening during hover
 @export var dive_lift_ratio: float = 0.25 # Thrust reduction when actively holding descend
 
 @export_group("2. Horizontal Propulsion & Drag")
-@export var forward_acceleration: float = 52.0 # Snappy arcade acceleration in m/s²
-@export var reverse_acceleration: float = 90.0 # Strong counter-steering / braking
-@export var horizontal_drag: float = 42.0 # Coasting deceleration in m/s²
-@export var max_speed: float = 28.0 # Top speed in m/s
+@export var forward_acceleration: float = 250.0 # Exaggerates tilted-rotor thrust for arcade response
+@export var reverse_acceleration: float = 90.0 # Extra counter-steering brake in m/s²
+@export var horizontal_drag: float = 1.35 # Air-drag coefficient; preserves a short amount of inertia
+@export var max_speed: float = 42.0 # Horizontal top speed in m/s
 
 @export_group("3. Cyclic Pitch, Roll & Yaw Torque")
-@export var pitch_torque: float = 950.0
-@export var roll_torque: float = 1100.0
-@export var yaw_torque: float = 750.0
-@export var max_pitch_deg: float = 16.0 # Target forward pitch ~12-18 deg
-@export var max_reverse_pitch_deg: float = 10.0 # Target backward pitch ~8-12 deg
-@export var max_roll_deg: float = 26.0 # Target roll ~20-30 deg
-@export var attitude_response: float = 9.0
+@export var pitch_torque: float = 2300.0
+@export var roll_torque: float = 2700.0
+@export var yaw_torque: float = 1800.0
+@export var max_pitch_deg: float = 18.0 # Target forward pitch ~12-18 deg
+@export var max_reverse_pitch_deg: float = 11.0 # Target backward pitch ~8-12 deg
+@export var max_roll_deg: float = 28.0 # Target roll ~20-30 deg
 
 @export_group("4. Auto Stabilization & Limits")
-@export var stabilization_strength: float = 18.0 # Leveling torque strength
-@export var angular_damping: float = 4.2
+@export var stabilization_strength: float = 24.0 # Physical leveling torque strength
+@export var angular_damping: float = 6.0
 @export var max_rise_speed: float = 10.0
 @export var max_fall_speed: float = 7.5
 
@@ -93,8 +92,6 @@ var building_contact_cooldown: float = 0.0
 
 var instakill_timer: float = 0.0
 var double_coins_timer: float = 0.0
-
-var _visual_flight_input: Vector2 = Vector2.ZERO
 
 func lock_controls() -> void:
 	controls_locked = true
@@ -204,8 +201,6 @@ func _process(delta: float) -> void:
 		# A fresh click fires immediately, and releasing stops fire this frame.
 		fire_timer = 0.0
 
-	_update_visual_attitude(delta)
-	
 	# Target marker visual
 	if current_target and is_instance_valid(current_target):
 		if not target_marker_instance and target_marker_scene:
@@ -230,7 +225,10 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	if dt <= 0.0:
 		dt = 0.016
 		
-	var local_up = state.transform.basis.y
+	var basis = state.transform.basis.orthonormalized()
+	var local_up = basis.y
+	var local_forward = -basis.z
+	var local_right = basis.x
 	
 	# --------------------------------------------------------------------------
 	# 1. Camera-Relative Input Reading (Keyboard WASD + Virtual Joystick)
@@ -250,7 +248,6 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var move_dir = (cam_right * input_2d.x) + (cam_forward * (-input_2d.y))
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
-	_visual_flight_input = input_2d if not controls_locked else Vector2.ZERO
 	
 	var wants_lift = not controls_locked and (
 		Input.is_action_pressed("fly_up") 
@@ -277,21 +274,26 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 		has_fuel = GameManager.boost > 0.0
 	
 	# --------------------------------------------------------------------------
-	# 2. Horizontal Velocity Steering (Responsive Arcade Rotor Thrust)
+	# 2. Horizontal thrust comes from the physically tilted rotor axis.
+	# The multiplier is deliberately exaggerated so 12-28 degree cyclic tilt
+	# still produces fast arcade acceleration instead of simulator-like drift.
 	# --------------------------------------------------------------------------
 	var h_vel = Vector3(state.linear_velocity.x, 0.0, state.linear_velocity.z)
-	if not controls_locked and move_dir.length_squared() > 0.01:
-		var desired_h_vel = move_dir.normalized() * max_speed
-		var accel = forward_acceleration
-		if h_vel.length_squared() > 0.25:
-			var alignment = h_vel.normalized().dot(move_dir.normalized())
-			accel = lerpf(forward_acceleration, reverse_acceleration, clampf((1.0 - alignment) * 0.5, 0.0, 1.0))
-		h_vel = h_vel.move_toward(desired_h_vel, accel * dt)
-	else:
-		h_vel = h_vel.move_toward(Vector3.ZERO, horizontal_drag * dt)
-	
-	state.linear_velocity.x = h_vel.x
-	state.linear_velocity.z = h_vel.z
+	var cyclic_horizontal = Vector3(local_up.x, 0.0, local_up.z)
+	state.apply_central_force(cyclic_horizontal * forward_acceleration * mass)
+	state.apply_central_force(-h_vel * horizontal_drag * mass)
+
+	# Strong braking only when the pilot asks for the opposite direction.
+	if not controls_locked and move_dir.length_squared() > 0.01 and h_vel.length_squared() > 1.0:
+		var steering_alignment = h_vel.normalized().dot(move_dir.normalized())
+		if steering_alignment < 0.0:
+			var counter_amount = -steering_alignment
+			state.apply_central_force(-h_vel.normalized() * reverse_acceleration * counter_amount * mass)
+
+	if h_vel.length() > max_speed:
+		var limited_h_vel = h_vel.normalized() * max_speed
+		state.linear_velocity.x = limited_h_vel.x
+		state.linear_velocity.z = limited_h_vel.z
 	
 	# --------------------------------------------------------------------------
 	# 3. Continuous Rotor Lift along Local Up Axis
@@ -313,35 +315,59 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 		_drain_fuel(base_fuel_drain_rate * dt)
 	
 	var total_lift = weight * lift_mult
+	state.apply_central_force(local_up * total_lift)
 	
 	# Altitude assist / sticky collective near hover
 	if not wants_lift and not wants_descend:
 		if abs(state.linear_velocity.y) < 2.0:
 			var alt_assist = -state.linear_velocity.y * altitude_assist_strength
-			total_lift += alt_assist
-	
-	state.apply_central_force(Vector3.UP * total_lift)
+			state.apply_central_force(Vector3.UP * alt_assist)
 	
 	# Cap maximum vertical rise & fall speed
 	state.linear_velocity.y = clampf(state.linear_velocity.y, -max_fall_speed, max_rise_speed)
 	
 	# --------------------------------------------------------------------------
-	# 4. Keep the physics body upright. Pitch and roll are applied to the visual
-	# child so collisions cannot make the flight controller fight itself.
+	# 4. Physical cyclic pitch and roll. Input selects a target attitude in the
+	# helicopter's yaw frame; PD torque leans the actual RigidBody toward it.
 	# --------------------------------------------------------------------------
-	local_up = state.transform.basis.y
-	var leveling_axis = local_up.cross(Vector3.UP)
-	state.apply_torque(leveling_axis * stabilization_strength * mass)
-	var tilt_angular_velocity = state.angular_velocity - Vector3.UP * state.angular_velocity.y
-	state.apply_torque(-tilt_angular_velocity * angular_damping * mass)
+	var flat_forward = Vector3(local_forward.x, 0.0, local_forward.z)
+	var flat_right = Vector3(local_right.x, 0.0, local_right.z)
+	if flat_forward.length_squared() < 0.01:
+		flat_forward = Vector3.FORWARD
+	else:
+		flat_forward = flat_forward.normalized()
+	if flat_right.length_squared() < 0.01:
+		flat_right = Vector3.RIGHT
+	else:
+		flat_right = flat_right.normalized()
+
+	var forward_input = move_dir.dot(flat_forward) if not controls_locked else 0.0
+	var right_input = move_dir.dot(flat_right) if not controls_locked else 0.0
+	var target_pitch = 0.0
+	if forward_input > 0.0:
+		target_pitch = deg_to_rad(-max_pitch_deg) * forward_input
+	elif forward_input < 0.0:
+		target_pitch = deg_to_rad(max_reverse_pitch_deg) * -forward_input
+	var target_roll = deg_to_rad(-max_roll_deg) * right_input
+
+	var current_pitch = asin(clampf(local_forward.y, -1.0, 1.0))
+	var current_roll = asin(clampf(local_right.y, -1.0, 1.0))
+	var pitch_gain = pitch_torque if abs(forward_input) > 0.02 else stabilization_strength * mass
+	var roll_gain = roll_torque if abs(right_input) > 0.02 else stabilization_strength * mass
+	var pitch_error = target_pitch - current_pitch
+	var roll_error = target_roll - current_roll
+	var pitch_damping = state.angular_velocity.dot(local_right) * angular_damping * mass
+	var roll_axis = basis.z
+	var roll_damping = state.angular_velocity.dot(roll_axis) * angular_damping * mass
+	state.apply_torque(local_right * (pitch_error * pitch_gain - pitch_damping))
+	state.apply_torque(roll_axis * (roll_error * roll_gain - roll_damping))
 	
 	# --------------------------------------------------------------------------
 	# 5. 360° Direction / Yaw Alignment
 	# --------------------------------------------------------------------------
-	if h_vel.length_squared() > 0.09:
-		var local_fwd = -state.transform.basis.z
-		var desired_yaw = atan2(-h_vel.x, -h_vel.z)
-		var cur_yaw = atan2(-local_fwd.x, -local_fwd.z)
+	if not controls_locked and move_dir.length_squared() > 0.01:
+		var desired_yaw = atan2(-move_dir.x, -move_dir.z)
+		var cur_yaw = atan2(-flat_forward.x, -flat_forward.z)
 		var yaw_error = wrapf(desired_yaw - cur_yaw, -PI, PI)
 		var yaw_torque_val = (yaw_error * yaw_torque) - (state.angular_velocity.y * angular_damping * mass)
 		state.apply_torque(Vector3.UP * yaw_torque_val)
@@ -349,23 +375,9 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 		state.apply_torque(Vector3.UP * (-state.angular_velocity.y * angular_damping * mass))
 	
 	# Safety: prevent over-rotation / tumbling upside down
-	if local_up.y < 0.2:
-		var righting_torque = Vector3.UP.cross(local_up) * -4000.0
-		state.apply_torque(righting_torque)
-
-func _update_visual_attitude(delta: float) -> void:
-	if not visual_heli:
-		return
-	
-	var target_pitch = 0.0
-	if _visual_flight_input.y < -0.05:
-		target_pitch = deg_to_rad(-max_pitch_deg) * -_visual_flight_input.y
-	elif _visual_flight_input.y > 0.05:
-		target_pitch = deg_to_rad(max_reverse_pitch_deg) * _visual_flight_input.y
-	var target_roll = deg_to_rad(-max_roll_deg) * _visual_flight_input.x
-	var response = 1.0 - exp(-attitude_response * delta)
-	visual_heli.rotation.x = lerp_angle(visual_heli.rotation.x, target_pitch, response)
-	visual_heli.rotation.z = lerp_angle(visual_heli.rotation.z, target_roll, response)
+	if local_up.y < 0.55:
+		var righting_axis = local_up.cross(Vector3.UP)
+		state.apply_torque(righting_axis * stabilization_strength * mass * 4.0)
 
 # ==============================================================================
 # 💥 DAMAGE, FUEL, TARGETING & SHOOTING
