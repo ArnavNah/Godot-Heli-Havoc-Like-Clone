@@ -1,9 +1,43 @@
-[gd_scene load_steps=6 format=3 uid="uid://c1pqchw2u4xaf"]
+[gd_scene load_steps=10 format=3 uid="uid://c1pqchw2u4xaf"]
 
 [ext_resource type="Script" path="res://scripts/player/player_helicopter_visual.gd" id="1_vis"]
 [ext_resource type="PackedScene" path="res://Player model/body.glb" id="2_body"]
 [ext_resource type="PackedScene" path="res://Player model/top propeller.glb" id="3_top"]
 [ext_resource type="PackedScene" path="res://Player model/back propeller.glb" id="4_back"]
+
+[sub_resource type="Gradient" id="Gradient_wing_airflow"]
+offsets = PackedFloat32Array(0, 0.18, 0.72, 1)
+colors = PackedColorArray(0.75, 0.97, 1, 0, 0.78, 0.98, 1, 0.3, 0.7, 0.94, 1, 0.16, 0.65, 0.92, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_wing_airflow"]
+gradient = SubResource("Gradient_wing_airflow")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wing_airflow"]
+emission_shape = 3
+emission_box_extents = Vector3(0.015, 0.012, 0.055)
+direction = Vector3(0, 0, 1)
+spread = 4.0
+initial_velocity_min = 15.0
+initial_velocity_max = 20.0
+gravity = Vector3(0, 0, 0)
+damping_min = 1.0
+damping_max = 2.0
+scale_min = 0.65
+scale_max = 1.0
+color_ramp = SubResource("GradientTexture1D_wing_airflow")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wing_airflow"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.76, 0.97, 1, 0.38)
+emission_enabled = true
+emission = Color(0.55, 0.9, 1, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_wing_airflow"]
+material = SubResource("StandardMaterial3D_wing_airflow")
+size = Vector3(0.025, 0.025, 0.16)
 
 [node name="PlayerHelicopterVisual" type="Node3D"]
 script = ExtResource("1_vis")
@@ -22,3 +56,27 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.435, -0.29)
 transform = Transform3D(-1.39876e-08, 0, -0.32, 0, 0.32, 0, 0.32, 0, -1.39876e-08, 0.1, 0.037, 0.86)
 
 [node name="BackPropeller" parent="TailRotorPivot" instance=ExtResource("4_back")]
+
+[node name="WingEffects" type="Node3D" parent="."]
+
+[node name="LeftWingFX" type="GPUParticles3D" parent="WingEffects"]
+position = Vector3(-0.6, 0.04, -0.18)
+emitting = false
+amount = 8
+lifetime = 0.08
+randomness = 0.35
+visibility_aabb = AABB(-3, -1, -1, 6, 2, 5)
+local_coords = false
+process_material = SubResource("ParticleProcessMaterial_wing_airflow")
+draw_pass_1 = SubResource("BoxMesh_wing_airflow")
+
+[node name="RightWingFX" type="GPUParticles3D" parent="WingEffects"]
+position = Vector3(0.6, 0.04, -0.18)
+emitting = false
+amount = 8
+lifetime = 0.08
+randomness = 0.35
+visibility_aabb = AABB(-3, -1, -1, 6, 2, 5)
+local_coords = false
+process_material = SubResource("ParticleProcessMaterial_wing_airflow")
+draw_pass_1 = SubResource("BoxMesh_wing_airflow")
