@@ -17,7 +17,7 @@ class_name PlayerHelicopterVisual
 
 @onready var body_root: Node3D = $BodyRoot
 @onready var main_rotor_pivot: Node3D = $MainRotorPivot
-@onready var tail_rotor_pivot: Node3D = $TailRotorPivot
+@onready var tail_rotor_pivot: Node3D = $TailRotorMount/TailRotorPivot
 @onready var left_wing_fx: GPUParticles3D = $WingEffects/LeftWingFX
 @onready var right_wing_fx: GPUParticles3D = $WingEffects/RightWingFX
 
@@ -61,8 +61,12 @@ func _process(delta: float) -> void:
 		main_rotor_pivot.rotate_y(current_main_speed * delta)
 		
 	if tail_rotor_pivot:
-		# The back propeller mesh lies in its local XY plane, so its shaft is Z.
-		tail_rotor_pivot.rotate_z(base_tail_rotor_speed * delta)
+		# The identity pivot sits inside the fixed side-facing mount, so its local
+		# Z rotation spins around the propeller shaft without wobbling the rotor.
+		tail_rotor_pivot.rotation.z = fmod(
+			tail_rotor_pivot.rotation.z + base_tail_rotor_speed * delta,
+			TAU
+		)
 
 func _update_wing_airflow(delta: float) -> void:
 	if not _physics_owner or not is_instance_valid(_physics_owner):

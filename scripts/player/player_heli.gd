@@ -14,7 +14,7 @@ const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 @export_group("1. Mass & Lift Forces")
 @export var mass_kg: float = 60.0
 @export var base_lift_ratio: float = 0.90 # Leaves enough uncompensated weight for a visible neutral descent
-@export var collective_strength: float = 1.65 # Climb thrust multiplier when holding Space
+@export var collective_strength: float = 2.25 # Fast arcade climb while holding Space / Up
 @export var neutral_descent_speed: float = 1.35 # Automatic sink rate whenever lift is released
 @export var altitude_assist_strength: float = 70.0 # Force response toward the neutral sink rate
 @export var dive_lift_ratio: float = 0.25 # Thrust reduction when actively holding descend
@@ -36,7 +36,7 @@ const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 @export_group("4. Auto Stabilization & Limits")
 @export var stabilization_strength: float = 24.0 # Physical leveling torque strength
 @export var angular_damping: float = 6.0
-@export var max_rise_speed: float = 10.0
+@export var max_rise_speed: float = 16.0
 @export var max_fall_speed: float = 7.5
 
 @export_group("5. Weapons & Auto-Aim")
