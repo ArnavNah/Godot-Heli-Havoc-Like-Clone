@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <filter id="mscShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Musical Double Note -->
+  <path d="M 44 86 C 44 76 34 72 24 78 C 14 84 14 96 22 102 C 32 108 44 102 44 92 L 44 38 L 94 24 L 94 76 C 94 66 84 62 74 68 C 64 74 64 86 72 92 C 82 98 94 92 94 82 L 94 14 L 34 30 L 34 92 C 34 92 34 94 34 96" fill="#FFFFFF" filter="url(#mscShadow)"/>
+  <ellipse cx="26" cy="92" rx="14" ry="10" fill="#FFFFFF" transform="rotate(-15 26 92)" filter="url(#mscShadow)"/>
+  <ellipse cx="76" cy="82" rx="14" ry="10" fill="#FFFFFF" transform="rotate(-15 76 82)" filter="url(#mscShadow)"/>
+  <polygon points="34,30 94,14 94,28 34,44" fill="#FFFFFF" filter="url(#mscShadow)"/>
+</svg>

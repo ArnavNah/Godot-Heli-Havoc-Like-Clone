@@ -9,40 +9,37 @@ class_name PlayerHelicopterVisual
 @onready var body_root: Node3D = $BodyRoot
 @onready var main_rotor_pivot: Node3D = $MainRotorPivot
 @onready var tail_rotor_pivot: Node3D = $TailRotorPivot
-@onready var anim_player: AnimationPlayer = get_node_or_null("AnimationPlayer")
 
 var current_main_speed: float = 32.0
 var target_main_speed: float = 32.0
 var is_spinning: bool = true
 
+func update_wing_effects(_speed_ratio: float, _roll_ratio: float = 0.0, _turn_boost: float = 0.0) -> void:
+	# Wing flare and trail effects completely removed per design specification
+	pass
+
 func _ready() -> void:
 	current_main_speed = base_main_rotor_speed
 	target_main_speed = base_main_rotor_speed
-	if anim_player and anim_player.has_animation("rotors_running"):
-		anim_player.play("rotors_running")
-
-func set_rotor_boost(is_boosting: bool) -> void:
-	target_main_speed = boost_main_rotor_speed if is_boosting else base_main_rotor_speed
 
 func _process(delta: float) -> void:
 	if not is_spinning or not auto_spin:
 		return
+		
+	current_main_speed = lerpf(current_main_speed, target_main_speed, 5.0 * delta)
 	
-	current_main_speed = move_toward(current_main_speed, target_main_speed, 100.0 * delta)
-	
-	# Main rotor spins around its own local Y axis
 	if main_rotor_pivot:
-		main_rotor_pivot.rotate_object_local(Vector3.UP, current_main_speed * delta)
-	
-	# Tail rotor spins around its own local Z axle
+		main_rotor_pivot.rotate_y(current_main_speed * delta)
+		
 	if tail_rotor_pivot:
-		var tail_speed = base_tail_rotor_speed * (current_main_speed / base_main_rotor_speed)
-		tail_rotor_pivot.rotate_object_local(Vector3(0, 0, 1), tail_speed * delta)
+		# The back propeller mesh lies in its local XY plane, so its shaft is Z.
+		tail_rotor_pivot.rotate_z(base_tail_rotor_speed * delta)
 
-func set_spinning(active: bool) -> void:
-	is_spinning = active
-	if anim_player:
-		if active:
-			anim_player.play("rotors_running")
-		else:
-			anim_player.stop()
+func set_boost(active: bool) -> void:
+	target_main_speed = boost_main_rotor_speed if active else base_main_rotor_speed
+
+func stop_rotors() -> void:
+	is_spinning = false
+
+func start_rotors() -> void:
+	is_spinning = true

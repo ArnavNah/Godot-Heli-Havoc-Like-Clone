@@ -1,4 +1,5 @@
-extends CharacterBody3D
+@tool
+extends RigidBody3D
 class_name PlayerHeli
 
 signal player_died()
@@ -7,45 +8,44 @@ const ExplosionScene = preload("res://scenes/effects/explosion_effect.tscn")
 const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 
 # ==============================================================================
-# 🎮 TUNABLE FEEL PARAMETERS (Godot Inspector)
+# 🎮 EXPOSED TUNING PARAMETERS (Godot Inspector)
 # ==============================================================================
 
-@export_group("1. Horizontal Speed & Acceleration")
-@export var max_speed: float = 27.0
-@export var forward_acceleration: float = 48.0
-@export var steering_acceleration: float = 62.0
-@export var reverse_acceleration: float = 85.0
-@export var coast_deceleration: float = 38.0
+@export_group("1. Mass & Lift Forces")
+@export var mass_kg: float = 60.0
+@export var base_lift_ratio: float = 0.92 # Fraction of gravity countered at neutral (gentle sinking)
+@export var collective_strength: float = 1.70 # Climb thrust multiplier when holding Space
+@export var altitude_assist_strength: float = 140.0 # Sticky collective dampening during hover
+@export var dive_lift_ratio: float = 0.25 # Thrust reduction when actively holding descend
 
-@export_group("2. Vertical Lift & Descent")
-@export var max_rise_speed: float = 8.5
-@export var max_fall_speed: float = 2.4
-@export var dive_speed: float = 4.0
-@export var neutral_sink_speed: float = 0.6
-@export var lift_acceleration: float = 16.0
-@export var sink_acceleration: float = 4.2
+@export_group("2. Horizontal Propulsion & Drag")
+@export var forward_acceleration: float = 52.0 # Snappy arcade acceleration in m/s²
+@export var reverse_acceleration: float = 90.0 # Strong counter-steering / braking
+@export var horizontal_drag: float = 42.0 # Coasting deceleration in m/s²
+@export var max_speed: float = 28.0 # Top speed in m/s
 
-@export_group("3. Visual Yaw & Heading")
-@export var yaw_speed: float = 7.5 # rad/sec
-@export var min_yaw_velocity_threshold: float = 0.35 # m/s
+@export_group("3. Cyclic Pitch, Roll & Yaw Torque")
+@export var pitch_torque: float = 950.0
+@export var roll_torque: float = 1100.0
+@export var yaw_torque: float = 750.0
+@export var max_pitch_deg: float = 16.0 # Target forward pitch ~12-18 deg
+@export var max_reverse_pitch_deg: float = 10.0 # Target backward pitch ~8-12 deg
+@export var max_roll_deg: float = 26.0 # Target roll ~20-30 deg
+@export var attitude_response: float = 9.0
 
-@export_group("4. Visual Banking & Pitch")
-@export var max_roll_deg: float = 34.0
-@export var max_pitch_deg: float = 14.0
-@export var bank_enter_response: float = 18.0
-@export var bank_return_response: float = 9.5
+@export_group("4. Auto Stabilization & Limits")
+@export var stabilization_strength: float = 18.0 # Leveling torque strength
+@export var angular_damping: float = 4.2
+@export var max_rise_speed: float = 10.0
+@export var max_fall_speed: float = 7.5
 
-@export_group("5. Cosmetic Hover Feel")
-@export var cosmetic_bob_amplitude: float = 0.16
-@export var cosmetic_bob_frequency: float = 3.5
-
-@export_group("6. Weapons & Auto-Aim")
+@export_group("5. Weapons & Auto-Aim")
 @export var bullet_scene: PackedScene = preload("res://scenes/projectiles/player_bullet.tscn")
 @export var target_marker_scene: PackedScene = preload("res://scenes/effects/target_marker.tscn")
 @export var fire_cooldown: float = 0.11
 @export var auto_aim_radius: float = 24.0
 
-@export_group("7. Fuel Economy")
+@export_group("6. Fuel Economy")
 @export var base_fuel_drain_rate: float = 2.0
 @export var lift_fuel_drain_rate: float = 3.6
 
@@ -53,30 +53,33 @@ const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 # 🌲 NODE REFERENCES
 # ==============================================================================
 
-@onready var visual_yaw_root: Node3D = $VisualYawRoot
-@onready var banking_root: Node3D = $VisualYawRoot/BankingRoot
-@onready var hover_visual_root: Node3D = get_node_or_null("VisualYawRoot/BankingRoot/HoverVisualRoot")
-@onready var player_visual: PlayerHelicopterVisual = get_node_or_null("VisualYawRoot/BankingRoot/HoverVisualRoot/PlayerHelicopterVisual")
-@onready var left_muzzle: Marker3D = get_node_or_null("VisualYawRoot/BankingRoot/HoverVisualRoot/WeaponMounts/LeftGunMuzzle")
-@onready var right_muzzle: Marker3D = get_node_or_null("VisualYawRoot/BankingRoot/HoverVisualRoot/WeaponMounts/RightGunMuzzle")
+@onready var visual_heli: PlayerHelicopterVisual = get_node_or_null("HelicopterVisual")
+@onready var left_muzzle: Marker3D = get_node_or_null("WeaponMounts/LeftGunMuzzle")
+@onready var right_muzzle: Marker3D = get_node_or_null("WeaponMounts/RightGunMuzzle")
+@onready var left_flash: MuzzleFlash = get_node_or_null("WeaponMounts/LeftGunMuzzle/MuzzleFlash")
+@onready var right_flash: MuzzleFlash = get_node_or_null("WeaponMounts/RightGunMuzzle/MuzzleFlash")
 
 @onready var health_component: Node = $HealthComponent
 @onready var fuel_component: Node = $FuelComponent
 @onready var progression_component: Node = $ProgressionComponent
 
+# Backwards compatibility getters for test suites & inspection
+var visual_yaw_root: Node3D:
+	get:
+		return self
+var banking_root: Node3D:
+	get:
+		return self
+
 # ==============================================================================
 # ⏱️ RUNTIME STATE
 # ==============================================================================
-
-var horizontal_velocity: Vector3 = Vector3.ZERO
-var vertical_velocity: float = 0.0
-var _prev_horizontal_velocity: Vector3 = Vector3.ZERO
-var _recoil_offset_z: float = 0.0
 
 var joystick_input: Vector2 = Vector2.ZERO
 var is_alive: bool = true
 var is_lifting: bool = false
 var controls_locked: bool = false
+var is_simulating_in_test: bool = false
 var spawn_invuln_timer: float = 2.0
 var distance_traveled: float = 0.0
 var last_pos: Vector3 = Vector3.ZERO
@@ -91,6 +94,8 @@ var building_contact_cooldown: float = 0.0
 var instakill_timer: float = 0.0
 var double_coins_timer: float = 0.0
 
+var _visual_flight_input: Vector2 = Vector2.ZERO
+
 func lock_controls() -> void:
 	controls_locked = true
 
@@ -101,22 +106,18 @@ func update_input(vector: Vector2) -> void:
 	joystick_input = vector
 
 func _ready() -> void:
-	if Engine.is_editor_hint():
+	mass = mass_kg
+	
+	if Engine.is_editor_hint() and not is_simulating_in_test:
 		return
 	
 	add_to_group("player")
 	add_to_group("PlayerHeli")
 	
-	# Floating motion mode for 3D aerial flight
-	motion_mode = CharacterBody3D.MOTION_MODE_FLOATING
 	collision_layer = 1
 	collision_mask = 22
 	
 	last_pos = global_position
-	
-	# Fallback for motion juice node naming
-	if not hover_visual_root:
-		hover_visual_root = get_node_or_null("VisualYawRoot/BankingRoot/MotionJuiceRoot")
 	
 	if health_component:
 		if health_component.has_signal("health_changed"):
@@ -158,11 +159,11 @@ func _ready() -> void:
 		crash_detector.body_entered.connect(_on_crash_detector_body_entered)
 
 # ==============================================================================
-# 🎮 GAMEPLAY PROCESS (Targeting, Timers & Shooting)
+# 🎮 GAMEPLAY PROCESS (Targeting, Shooting & Timers)
 # ==============================================================================
 
 func _process(delta: float) -> void:
-	if Engine.is_editor_hint():
+	if Engine.is_editor_hint() and not is_simulating_in_test:
 		return
 		
 	if not is_alive:
@@ -171,9 +172,6 @@ func _process(delta: float) -> void:
 		return
 	
 	motion_time += delta
-	
-	# Decay cosmetic weapon recoil
-	_recoil_offset_z = move_toward(_recoil_offset_z, 0.0, 1.4 * delta)
 	
 	# Timers
 	if building_contact_cooldown > 0.0:
@@ -187,42 +185,32 @@ func _process(delta: float) -> void:
 		if GameManager:
 			GameManager.gold_multiplier = 2 if double_coins_timer > 0.0 else 1
 	
-	# Auto-Aim Target Detection
-	_update_auto_aim()
+	# Track distance traveled
+	var frame_dist = global_position.distance_to(last_pos)
+	if frame_dist < 10.0:
+		distance_traveled += frame_dist
+	last_pos = global_position
 	
-	# Firing
-	if controls_locked:
-		return
-		
+	# Auto-targeting remains independent of the fire trigger.
+	_update_targeting()
+	
+	var fire_held = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
+	var current_fire_rate = fire_cooldown / (GameManager.get_stat_multiplier("fire_rate") if GameManager else 1.0)
 	fire_timer = maxf(0.0, fire_timer - delta)
-	if (Input.is_action_pressed("shoot") or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)) and fire_timer <= 0.0:
+	if not controls_locked and fire_held and fire_timer <= 0.0:
 		shoot()
+		fire_timer = current_fire_rate
+	elif not fire_held:
+		# A fresh click fires immediately, and releasing stops fire this frame.
+		fire_timer = 0.0
 
-func _update_auto_aim() -> void:
-	if not is_inside_tree():
-		return
+	_update_visual_attitude(delta)
 	
-	var enemies = get_tree().get_nodes_in_group("enemies")
-	var closest_enemy: Node3D = null
-	var closest_dist: float = auto_aim_radius
-	
-	for enemy in enemies:
-		if not is_instance_valid(enemy):
-			continue
-		if enemy.get("is_destroyed") == true:
-			continue
-		var dist = global_position.distance_to(enemy.global_position)
-		if dist <= closest_dist:
-			closest_dist = dist
-			closest_enemy = enemy
-	
-	current_target = closest_enemy
-	
+	# Target marker visual
 	if current_target and is_instance_valid(current_target):
 		if not target_marker_instance and target_marker_scene:
 			target_marker_instance = target_marker_scene.instantiate()
 			get_tree().root.add_child(target_marker_instance)
-		
 		if target_marker_instance:
 			target_marker_instance.visible = true
 			target_marker_instance.global_position = current_target.global_position + Vector3(0, 0.9, 0)
@@ -231,19 +219,27 @@ func _update_auto_aim() -> void:
 			target_marker_instance.visible = false
 
 # ==============================================================================
-# 🚁 AUTHORITATIVE PHYSICS LOOP (Movement, Steering & Visuals)
+# 🚁 ASSISTED RIGIDBODY FLIGHT FORCES (Integrate Forces)
 # ==============================================================================
 
-func _physics_process(delta: float) -> void:
-	if Engine.is_editor_hint() or not is_alive:
+func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
+	if (Engine.is_editor_hint() and not is_simulating_in_test) or not is_alive:
 		return
 	
-	# 1. Gather Camera-Relative 360° Movement Input
+	var dt = state.step
+	if dt <= 0.0:
+		dt = 0.016
+		
+	var local_up = state.transform.basis.y
+	
+	# --------------------------------------------------------------------------
+	# 1. Camera-Relative Input Reading (Keyboard WASD + Virtual Joystick)
+	# --------------------------------------------------------------------------
 	var input_2d = joystick_input
 	if input_2d.length_squared() < 0.01:
 		input_2d = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	
-	var cam = get_viewport().get_camera_3d()
+	var cam: Camera3D = get_viewport().get_camera_3d() if is_inside_tree() and get_viewport() else null
 	var cam_forward = -cam.global_transform.basis.z if cam else Vector3.FORWARD
 	var cam_right = cam.global_transform.basis.x if cam else Vector3.RIGHT
 	cam_forward.y = 0.0
@@ -254,42 +250,25 @@ func _physics_process(delta: float) -> void:
 	var move_dir = (cam_right * input_2d.x) + (cam_forward * (-input_2d.y))
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
+	_visual_flight_input = input_2d if not controls_locked else Vector2.ZERO
 	
-	# 2. Horizontal Velocity Steering (Multi-Stage Acceleration & Counter-Steering)
-	if controls_locked:
-		horizontal_velocity = horizontal_velocity.move_toward(Vector3.ZERO, coast_deceleration * 1.5 * delta)
-	elif move_dir.length_squared() < 0.001:
-		# Released controls: gentle coast deceleration (0.4-0.7s glide to stop)
-		horizontal_velocity = horizontal_velocity.move_toward(Vector3.ZERO, coast_deceleration * delta)
-	else:
-		var desired_velocity = move_dir * max_speed
-		var selected_accel = forward_acceleration
-		
-		var cur_h_speed_sq = horizontal_velocity.length_squared()
-		if cur_h_speed_sq > 0.2:
-			var cur_h_dir = horizontal_velocity.normalized()
-			var dot = cur_h_dir.dot(move_dir)
-			
-			if dot >= 0.65:
-				# Holding same general direction
-				selected_accel = forward_acceleration
-			elif dot >= 0.0:
-				# Turning sideways / curving
-				selected_accel = steering_acceleration
-			else:
-				# Reversing / counter-steering (fast responsive dodge)
-				selected_accel = reverse_acceleration
-		else:
-			# Starting from rest
-			selected_accel = forward_acceleration
-		
-		# Full Vector3 steering move_toward (preserves smooth diagonal curvature)
-		horizontal_velocity = horizontal_velocity.move_toward(desired_velocity, selected_accel * delta)
-	
-	# 3. Vertical Flight (Continuous Smooth Buoyant Lift & Descent)
-	var wants_lift = not controls_locked and (Input.is_action_pressed("fly_up") or Input.is_key_pressed(KEY_SPACE))
-	var wants_descend = not controls_locked and (Input.is_action_pressed("fly_down") or Input.is_key_pressed(KEY_CTRL))
+	var wants_lift = not controls_locked and (
+		Input.is_action_pressed("fly_up") 
+		or Input.is_key_pressed(KEY_SPACE) 
+		or Input.is_key_pressed(KEY_UP)
+	)
+	var wants_descend = not controls_locked and (
+		Input.is_action_pressed("fly_down") 
+		or Input.is_key_pressed(KEY_CTRL) 
+		or Input.is_key_pressed(KEY_SHIFT) 
+		or Input.is_key_pressed(KEY_C) 
+		or Input.is_key_pressed(KEY_DOWN)
+	)
 	is_lifting = wants_lift
+	
+	# Safety unlock if player is commanding movement
+	if controls_locked and (move_dir.length_squared() > 0.05 or wants_lift) and motion_time > 3.0:
+		controls_locked = false
 	
 	var has_fuel = true
 	if fuel_component and fuel_component.get("current_fuel") != null:
@@ -297,204 +276,128 @@ func _physics_process(delta: float) -> void:
 	elif GameManager:
 		has_fuel = GameManager.boost > 0.0
 	
-	if wants_lift and has_fuel:
-		vertical_velocity = move_toward(vertical_velocity, max_rise_speed, lift_acceleration * delta)
-		_drain_fuel(lift_fuel_drain_rate * delta)
-	elif wants_descend:
-		# Controlled descent without plunging
-		vertical_velocity = move_toward(vertical_velocity, -dive_speed, sink_acceleration * 1.5 * delta)
-		_drain_fuel(base_fuel_drain_rate * delta)
+	# --------------------------------------------------------------------------
+	# 2. Horizontal Velocity Steering (Responsive Arcade Rotor Thrust)
+	# --------------------------------------------------------------------------
+	var h_vel = Vector3(state.linear_velocity.x, 0.0, state.linear_velocity.z)
+	if not controls_locked and move_dir.length_squared() > 0.01:
+		var desired_h_vel = move_dir.normalized() * max_speed
+		var accel = forward_acceleration
+		if h_vel.length_squared() > 0.25:
+			var alignment = h_vel.normalized().dot(move_dir.normalized())
+			accel = lerpf(forward_acceleration, reverse_acceleration, clampf((1.0 - alignment) * 0.5, 0.0, 1.0))
+		h_vel = h_vel.move_toward(desired_h_vel, accel * dt)
 	else:
-		# Buoyant continuous float with very gentle settling
-		vertical_velocity = move_toward(vertical_velocity, -neutral_sink_speed, sink_acceleration * delta)
-		_drain_fuel(base_fuel_drain_rate * delta)
+		h_vel = h_vel.move_toward(Vector3.ZERO, horizontal_drag * dt)
 	
-	# 4. Construct Authoritative Velocity & Execute Floating Physics Slide
-	velocity.x = horizontal_velocity.x
-	velocity.z = horizontal_velocity.z
-	velocity.y = vertical_velocity
+	state.linear_velocity.x = h_vel.x
+	state.linear_velocity.z = h_vel.z
 	
-	move_and_slide()
+	# --------------------------------------------------------------------------
+	# 3. Continuous Rotor Lift along Local Up Axis
+	# --------------------------------------------------------------------------
+	var gravity_mag = state.total_gravity.length()
+	if gravity_mag < 0.1:
+		gravity_mag = 9.8
+	var weight = mass * gravity_mag
 	
-	# Update internal velocities from slide results for natural wall interaction
-	horizontal_velocity = Vector3(velocity.x, 0.0, velocity.z)
-	vertical_velocity = velocity.y
+	var lift_mult = base_lift_ratio
+	if wants_lift and has_fuel:
+		lift_mult = collective_strength
+		_drain_fuel(lift_fuel_drain_rate * dt)
+	elif wants_descend:
+		lift_mult = dive_lift_ratio
+		_drain_fuel(base_fuel_drain_rate * dt)
+	else:
+		lift_mult = base_lift_ratio
+		_drain_fuel(base_fuel_drain_rate * dt)
 	
-	# Keep base physics CharacterBody3D rotation strictly upright
-	rotation = Vector3.ZERO
+	var total_lift = weight * lift_mult
 	
-	# Track distance
-	var h_dist = Vector2(global_position.x - last_pos.x, global_position.z - last_pos.z).length()
-	distance_traveled += h_dist
-	last_pos = global_position
+	# Altitude assist / sticky collective near hover
+	if not wants_lift and not wants_descend:
+		if abs(state.linear_velocity.y) < 2.0:
+			var alt_assist = -state.linear_velocity.y * altitude_assist_strength
+			total_lift += alt_assist
 	
-	# 5. Apply Visual Heading, Dynamic Acceleration Banking & Cosmetic Hover
-	_apply_visual_presentation(cam_right, cam_forward, delta)
+	state.apply_central_force(Vector3.UP * total_lift)
+	
+	# Cap maximum vertical rise & fall speed
+	state.linear_velocity.y = clampf(state.linear_velocity.y, -max_fall_speed, max_rise_speed)
+	
+	# --------------------------------------------------------------------------
+	# 4. Keep the physics body upright. Pitch and roll are applied to the visual
+	# child so collisions cannot make the flight controller fight itself.
+	# --------------------------------------------------------------------------
+	local_up = state.transform.basis.y
+	var leveling_axis = local_up.cross(Vector3.UP)
+	state.apply_torque(leveling_axis * stabilization_strength * mass)
+	var tilt_angular_velocity = state.angular_velocity - Vector3.UP * state.angular_velocity.y
+	state.apply_torque(-tilt_angular_velocity * angular_damping * mass)
+	
+	# --------------------------------------------------------------------------
+	# 5. 360° Direction / Yaw Alignment
+	# --------------------------------------------------------------------------
+	if h_vel.length_squared() > 0.09:
+		var local_fwd = -state.transform.basis.z
+		var desired_yaw = atan2(-h_vel.x, -h_vel.z)
+		var cur_yaw = atan2(-local_fwd.x, -local_fwd.z)
+		var yaw_error = wrapf(desired_yaw - cur_yaw, -PI, PI)
+		var yaw_torque_val = (yaw_error * yaw_torque) - (state.angular_velocity.y * angular_damping * mass)
+		state.apply_torque(Vector3.UP * yaw_torque_val)
+	else:
+		state.apply_torque(Vector3.UP * (-state.angular_velocity.y * angular_damping * mass))
+	
+	# Safety: prevent over-rotation / tumbling upside down
+	if local_up.y < 0.2:
+		var righting_torque = Vector3.UP.cross(local_up) * -4000.0
+		state.apply_torque(righting_torque)
 
-func _drain_fuel(amount: float) -> void:
-	if fuel_component and fuel_component.has_method("consume_fuel"):
-		fuel_component.consume_fuel(amount)
-	if GameManager:
-		GameManager.use_boost(amount)
-
-# ==============================================================================
-# 🎨 VISUAL PRESENTATION & ROTATION (Decoupled Node Hierarchy)
-# ==============================================================================
-
-func _apply_visual_presentation(cam_right: Vector3, cam_forward: Vector3, delta: float) -> void:
-	var h_speed = horizontal_velocity.length()
-	
-	# --- A. VisualYawRoot: Shortest-Angle Yaw Follows Actual Velocity ---
-	if visual_yaw_root and h_speed > min_yaw_velocity_threshold:
-		var target_yaw = atan2(-horizontal_velocity.x, -horizontal_velocity.z)
-		var diff = wrapf(target_yaw - visual_yaw_root.rotation.y, -PI, PI)
-		var max_step = yaw_speed * delta
-		if abs(diff) <= max_step:
-			visual_yaw_root.rotation.y = target_yaw
-		else:
-			visual_yaw_root.rotation.y += sign(diff) * max_step
-	
-	# --- B. BankingRoot: Roll & Pitch Driven Dominantly by Acceleration Change ---
-	if banking_root:
-		# Calculate actual horizontal acceleration vector
-		var h_accel = (horizontal_velocity - _prev_horizontal_velocity) / maxf(0.0001, delta)
-		_prev_horizontal_velocity = horizontal_velocity
-		
-		# Project velocity and acceleration onto screen-relative axes
-		var screen_vx = horizontal_velocity.dot(cam_right) / max_speed
-		var screen_vz = horizontal_velocity.dot(cam_forward) / max_speed
-		
-		var screen_accel_x = h_accel.dot(cam_right)
-		var screen_accel_z = h_accel.dot(cam_forward)
-		
-		# Quick smooth tilt: direct velocity bank + snappy acceleration kick into turns
-		var direct_roll = -clamp(screen_vx, -1.0, 1.0) * deg_to_rad(max_roll_deg * 0.72)
-		var accel_roll = -clamp(screen_accel_x / 28.0, -1.0, 1.0) * deg_to_rad(max_roll_deg * 0.48)
-		var target_roll = clamp(direct_roll + accel_roll, -deg_to_rad(max_roll_deg), deg_to_rad(max_roll_deg))
-		
-		# Pitch: Forward velocity dips nose down, braking/reversing pitches up
-		var direct_pitch = -clamp(screen_vz, -1.0, 1.0) * deg_to_rad(max_pitch_deg * 0.65)
-		var accel_pitch = -clamp(screen_accel_z / 25.0, -1.0, 1.0) * deg_to_rad(max_pitch_deg * 0.5)
-		var target_pitch = clamp(direct_pitch + accel_pitch, -deg_to_rad(max_pitch_deg), deg_to_rad(max_pitch_deg))
-		
-		# Asymmetric fast exponential smoothing (quick enter, buttery return)
-		var cur_roll = banking_root.rotation.z
-		var cur_pitch = banking_root.rotation.x
-		
-		var roll_rate = bank_enter_response if abs(target_roll) > abs(cur_roll) else bank_return_response
-		var pitch_rate = bank_enter_response if abs(target_pitch) > abs(cur_pitch) else bank_return_response
-		
-		banking_root.rotation.z = lerp_angle(cur_roll, target_roll, 1.0 - exp(-roll_rate * delta))
-		banking_root.rotation.x = lerp_angle(cur_pitch, target_pitch, 1.0 - exp(-pitch_rate * delta))
-	
-	# --- C. HoverVisualRoot: Purely Cosmetic Hover Breathing (No Physics Tampering) ---
-	if hover_visual_root:
-		var speed_factor = clampf(h_speed / max_speed, 0.0, 1.0)
-		var bob_amp = lerp(cosmetic_bob_amplitude, cosmetic_bob_amplitude * 0.35, speed_factor)
-		var bob_y = sin(motion_time * cosmetic_bob_frequency) * bob_amp
-		hover_visual_root.position = Vector3(0.0, bob_y, _recoil_offset_z)
-	
-	# --- D. Rotor Speed Scaling ---
-	if player_visual and player_visual.has_method("set_rotor_boost"):
-		player_visual.set_rotor_boost(is_lifting)
-
-# ==============================================================================
-# 💥 SHOOTING & WEAPONS
-# ==============================================================================
-
-func shoot() -> void:
-	if not is_alive or not bullet_scene:
+func _update_visual_attitude(delta: float) -> void:
+	if not visual_heli:
 		return
 	
-	fire_timer = fire_cooldown
-	
-	var muzzle = left_muzzle if fire_left_next else right_muzzle
-	fire_left_next = not fire_left_next
-	
-	var spawn_pos = muzzle.global_position if muzzle else global_position
-	
-	var fire_dir = Vector3.ZERO
-	if current_target and is_instance_valid(current_target) and current_target.get("is_destroyed") != true:
-		var target_aim_point = current_target.global_position + Vector3(0, 0.6, 0)
-		fire_dir = (target_aim_point - spawn_pos).normalized()
-	else:
-		fire_dir = -visual_yaw_root.global_transform.basis.z if visual_yaw_root else -global_transform.basis.z
-	
-	# Spawn muzzle flash locked to active gun muzzle
-	if MuzzleFlashScene:
-		var flash = MuzzleFlashScene.instantiate()
-		if muzzle:
-			muzzle.add_child(flash)
-			flash.position = Vector3.ZERO
-			flash.rotation = Vector3.ZERO
-		else:
-			get_tree().root.add_child(flash)
-			flash.global_position = spawn_pos
-			if fire_dir.length_squared() > 0.001:
-				var up_v = Vector3.UP if abs(fire_dir.dot(Vector3.UP)) < 0.99 else Vector3.RIGHT
-				flash.look_at(spawn_pos + fire_dir, up_v)
-	
-	# Spawn bullet tracer in world space
-	var bullet = bullet_scene.instantiate()
-	get_tree().root.add_child(bullet)
-	bullet.global_position = spawn_pos
-	
-	var damage = 9999 if instakill_timer > 0.0 else 10
-	if bullet.has_method("setup"):
-		bullet.setup(fire_dir, damage)
-	
-	# Snappy cosmetic recoil kick
-	_recoil_offset_z = 0.08
-	
-	var cam_rig = get_parent().get_node_or_null("CameraRig") if get_parent() else null
-	if cam_rig and cam_rig.has_method("add_shake"):
-		cam_rig.add_shake(0.04)
+	var target_pitch = 0.0
+	if _visual_flight_input.y < -0.05:
+		target_pitch = deg_to_rad(-max_pitch_deg) * -_visual_flight_input.y
+	elif _visual_flight_input.y > 0.05:
+		target_pitch = deg_to_rad(max_reverse_pitch_deg) * _visual_flight_input.y
+	var target_roll = deg_to_rad(-max_roll_deg) * _visual_flight_input.x
+	var response = 1.0 - exp(-attitude_response * delta)
+	visual_heli.rotation.x = lerp_angle(visual_heli.rotation.x, target_pitch, response)
+	visual_heli.rotation.z = lerp_angle(visual_heli.rotation.z, target_roll, response)
 
 # ==============================================================================
-# 🛡️ POWERUPS, HEALTH & DAMAGE
+# 💥 DAMAGE, FUEL, TARGETING & SHOOTING
 # ==============================================================================
 
-func apply_powerup(type: String, duration: float = 10.0) -> void:
-	match type:
-		"INSTAKILL":
-			instakill_timer = duration
-			if GameManager:
-				GameManager.notification_triggered.emit("INSTAKILL ACTIVE (10s)!")
-		"DOUBLE_COINS":
-			double_coins_timer = duration
-			if GameManager:
-				GameManager.gold_multiplier = 2
-				GameManager.notification_triggered.emit("2X COINS ACTIVE (15s)!")
-		"NUKE":
-			_trigger_nuke()
+func _drain_fuel(amount: float) -> void:
+	if fuel_component and fuel_component.has_method("drain_fuel"):
+		fuel_component.drain_fuel(amount)
+	elif GameManager:
+		GameManager.boost = maxf(0.0, GameManager.boost - amount)
+		GameManager.boost_changed.emit(GameManager.boost, GameManager.max_boost)
 
-func _trigger_nuke() -> void:
-	var turrets = get_tree().get_nodes_in_group("enemies")
-	for t in turrets:
-		if is_instance_valid(t) and t.has_method("destroy_turret"):
-			var dist = global_position.distance_to(t.global_position)
-			if dist <= 55.0:
-				t.destroy_turret()
+func take_damage(amount: int) -> void:
+	if not is_alive or spawn_invuln_timer > 0.0:
+		return
 	
-	var bullets = get_tree().get_nodes_in_group("enemy_projectiles")
-	for b in bullets:
-		if is_instance_valid(b):
-			b.queue_free()
+	var armor_mult = GameManager.get_stat_multiplier("armor") if GameManager else 1.0
+	var final_amount = maxi(1, int(amount / maxf(0.2, armor_mult)))
+	
+	if health_component and health_component.has_method("take_damage"):
+		health_component.take_damage(final_amount)
+	elif GameManager:
+		GameManager.health = maxi(0, GameManager.health - final_amount)
+		GameManager.health_changed.emit(GameManager.health, GameManager.max_health)
+		if GameManager.health <= 0:
+			_on_death()
 
-func add_fuel(amount: float = 35.0) -> void:
-	if fuel_component and fuel_component.has_method("add_fuel"):
-		fuel_component.add_fuel(amount)
-	if GameManager:
-		GameManager.add_boost(amount)
+func take_hit(amount: int) -> void:
+	take_damage(amount)
 
-func add_xp(amount: int = 5) -> void:
-	if progression_component and progression_component.has_method("add_xp"):
-		progression_component.add_xp(amount)
-	if GameManager:
-		GameManager.add_xp(amount)
-
-func heal(amount: int = 25) -> void:
-	if not is_alive or amount <= 0:
+func heal(amount: int) -> void:
+	if not is_alive:
 		return
 	if health_component and health_component.has_method("heal"):
 		health_component.heal(amount)
@@ -502,51 +405,105 @@ func heal(amount: int = 25) -> void:
 		GameManager.health = mini(GameManager.max_health, GameManager.health + amount)
 		GameManager.health_changed.emit(GameManager.health, GameManager.max_health)
 
-func take_damage(amount: int = 15) -> void:
-	if not is_alive or spawn_invuln_timer > 0.0 or amount <= 0:
+func shoot() -> void:
+	if not bullet_scene:
 		return
-		
-	if health_component and health_component.has_method("take_damage"):
-		health_component.take_damage(amount)
-	elif GameManager:
-		GameManager.health = max(0, GameManager.health - amount)
-		GameManager.health_changed.emit(GameManager.health, GameManager.max_health)
 	
-	var cam_rig = get_parent().get_node_or_null("CameraRig") if get_parent() else null
-	if cam_rig and cam_rig.has_method("add_shake"):
-		cam_rig.add_shake(0.35)
+	var chosen_muzzle: Marker3D = left_muzzle if fire_left_next else right_muzzle
+	var chosen_flash: MuzzleFlash = left_flash if fire_left_next else right_flash
+	fire_left_next = not fire_left_next
 	
-	var curr_hp = health_component.current_health if health_component else (GameManager.health if GameManager else 0)
-	if curr_hp <= 0:
-		crash()
+	if not chosen_muzzle:
+		chosen_muzzle = left_muzzle if left_muzzle else right_muzzle
+	if not chosen_muzzle:
+		return
+	
+	if chosen_flash and chosen_flash.has_method("fire"):
+		chosen_flash.fire()
+	
+	var base_dmg = 10
+	var dmg_mult = GameManager.get_stat_multiplier("weapon_damage") if GameManager else 1.0
+	var damage = 9999 if instakill_timer > 0.0 else int(base_dmg * dmg_mult)
+	
+	# Determine bullet flight direction
+	var shoot_dir: Vector3 = -chosen_muzzle.global_transform.basis.z
+	if current_target and is_instance_valid(current_target):
+		shoot_dir = (current_target.global_position + Vector3(0, 0.4, 0) - chosen_muzzle.global_position).normalized()
+	
+	var bullet = bullet_scene.instantiate()
+	get_tree().root.add_child(bullet)
+	bullet.global_position = chosen_muzzle.global_position
+	
+	if bullet.has_method("setup"):
+		bullet.setup(shoot_dir, damage)
+	
+	# Extra Projectiles Upgrade
+	var extra_bullets = GameManager.get_stat_flat_value("extra_projectiles") if GameManager else 0
+	if extra_bullets > 0:
+		for i in range(extra_bullets):
+			var angle_deg = 5.0 * (i + 1) * (-1 if i % 2 == 0 else 1)
+			var spread_dir = shoot_dir.rotated(Vector3.UP, deg_to_rad(angle_deg))
+			var extra_b = bullet_scene.instantiate()
+			get_tree().root.add_child(extra_b)
+			extra_b.global_position = chosen_muzzle.global_position
+			if extra_b.has_method("setup"):
+				extra_b.setup(spread_dir, damage)
+
+func _update_targeting() -> void:
+	if current_target and is_instance_valid(current_target):
+		var dist = global_position.distance_to(current_target.global_position)
+		if dist > auto_aim_radius * 1.3:
+			current_target = null
+		elif current_target.has_method("is_dead") and current_target.is_dead():
+			current_target = null
+	
+	if not current_target or not is_instance_valid(current_target):
+		current_target = _find_best_target()
+
+func _find_best_target() -> Node3D:
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	var best_enemy: Node3D = null
+	var closest_dist: float = auto_aim_radius
+	
+	for enemy in enemies:
+		if not is_instance_valid(enemy):
+			continue
+		if enemy.has_method("is_dead") and enemy.is_dead():
+			continue
+		var d = global_position.distance_to(enemy.global_position)
+		if d < closest_dist:
+			closest_dist = d
+			best_enemy = enemy
+	
+	return best_enemy
 
 func _on_crash_detector_body_entered(body: Node3D) -> void:
-	if not is_alive or controls_locked or spawn_invuln_timer > 0.0:
+	if building_contact_cooldown > 0.0 or not is_alive or spawn_invuln_timer > 0.0:
 		return
 	
-	if (body.collision_layer & 2) != 0 or body.is_in_group("environment") or body.is_in_group("buildings") or body.has_method("get_roof_y"):
-		if building_contact_cooldown <= 0.0:
-			building_contact_cooldown = 0.8
-			take_damage(15)
+	building_contact_cooldown = 0.5
+	take_damage(20)
+	
+	var cam_rig = get_tree().root.find_child("CameraRig", true, false)
+	if cam_rig and cam_rig.has_method("add_shake"):
+		cam_rig.add_shake(0.4)
 
-func crash() -> void:
+func _on_death() -> void:
 	if not is_alive:
 		return
 	is_alive = false
+	controls_locked = true
 	
 	if target_marker_instance and is_instance_valid(target_marker_instance):
 		target_marker_instance.queue_free()
-		target_marker_instance = null
 	
-	if ExplosionScene:
-		var boom = ExplosionScene.instantiate()
-		get_tree().root.add_child(boom)
-		boom.global_position = global_position
+	var expl = ExplosionScene.instantiate()
+	get_tree().root.add_child(expl)
+	expl.global_position = global_position
 	
-	if visual_yaw_root:
-		visual_yaw_root.visible = false
+	var cam_rig = get_tree().root.find_child("CameraRig", true, false)
+	if cam_rig and cam_rig.has_method("add_shake"):
+		cam_rig.add_shake(1.0)
 	
+	visible = false
 	player_died.emit()
-
-func _on_death() -> void:
-	crash()

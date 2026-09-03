@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="canRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5252"/>
+      <stop offset="50%" stop-color="#E11D48"/>
+      <stop offset="100%" stop-color="#9F1239"/>
+    </linearGradient>
+    <linearGradient id="spoutYellow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="50%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+    <filter id="gShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Can Main Body -->
+  <rect x="24" y="38" width="80" height="80" rx="14" fill="url(#canRed)" stroke="#4C0519" stroke-width="6" filter="url(#gShadow)"/>
+  <!-- Top Handle -->
+  <path d="M 40 38 L 40 22 C 40 16 46 12 52 12 L 76 12 C 82 12 88 16 88 22 L 88 38" fill="none" stroke="#4C0519" stroke-width="14" stroke-linecap="round"/>
+  <path d="M 40 38 L 40 22 C 40 18 44 16 48 16 L 80 16 C 84 16 88 18 88 22 L 88 38" fill="none" stroke="url(#canRed)" stroke-width="6" stroke-linecap="round"/>
+  <!-- Yellow Flexible Spout / Nozzle -->
+  <path d="M 88 36 L 102 18 C 106 14 112 16 114 20 L 114 30 C 114 34 110 38 106 40 L 96 44" fill="url(#spoutYellow)" stroke="#854D0E" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Ridges on spout -->
+  <line x1="97" y1="23" x2="103" y2="28" stroke="#854D0E" stroke-width="3"/>
+  <line x1="102" y1="28" x2="108" y2="33" stroke="#854D0E" stroke-width="3"/>
+  <!-- Embossed X on canister -->
+  <line x1="38" y1="52" x2="90" y2="104" stroke="#FFE4E6" stroke-width="8" stroke-linecap="round" opacity="0.6"/>
+  <line x1="90" y1="52" x2="38" y2="104" stroke="#FFE4E6" stroke-width="8" stroke-linecap="round" opacity="0.6"/>
+  <!-- Body Highlight -->
+  <path d="M 32 50 L 32 106" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+</svg>

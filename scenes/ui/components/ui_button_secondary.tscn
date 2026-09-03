@@ -1,0 +1,75 @@
+[gd_scene load_steps=6 format=3 uid="uid://cui_button_secondary"]
+
+[ext_resource type="Theme" uid="uid://c6heli_theme_res" path="res://resources/themes/heli_theme.tres" id="1_theme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_s_normal"]
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 22.0
+content_margin_bottom = 12.0
+bg_color = Color(0.0156863, 0.521569, 0.827451, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.0352941, 0.223529, 0.360784, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+corner_detail = 8
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 1
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_s_hover"]
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 22.0
+content_margin_bottom = 12.0
+bg_color = Color(0.054902, 0.615686, 0.945098, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.0352941, 0.223529, 0.360784, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+corner_detail = 8
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 1
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_s_pressed"]
+content_margin_left = 22.0
+content_margin_top = 13.0
+content_margin_right = 22.0
+content_margin_bottom = 9.0
+bg_color = Color(0.0117647, 0.435294, 0.701961, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.0352941, 0.223529, 0.360784, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+corner_detail = 8
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 1
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+
+[node name="UIButtonSecondary" type="Button"]
+custom_minimum_size = Vector2(160, 48)
+theme = ExtResource("1_theme")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_s_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_s_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_s_pressed")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "Action"

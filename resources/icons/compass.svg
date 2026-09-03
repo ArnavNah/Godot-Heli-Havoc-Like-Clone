@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="goldRim" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFE773"/>
+      <stop offset="60%" stop-color="#FFA800"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </radialGradient>
+    <linearGradient id="dialGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E0F2FE"/>
+      <stop offset="50%" stop-color="#BAE6FD"/>
+      <stop offset="100%" stop-color="#7DD3FC"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="2" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <!-- Top Loop -->
+  <circle cx="64" cy="18" r="14" fill="none" stroke="#FFA800" stroke-width="7" filter="url(#shadow)"/>
+  <circle cx="64" cy="18" r="14" fill="none" stroke="#FFE773" stroke-width="3"/>
+  <!-- Outer Gold Body -->
+  <circle cx="64" cy="70" r="52" fill="url(#goldRim)" stroke="#78350F" stroke-width="5" filter="url(#shadow)"/>
+  <!-- Inner Rim -->
+  <circle cx="64" cy="70" r="44" fill="#0369A1" stroke="#0C4A6E" stroke-width="3"/>
+  <!-- Dial Face -->
+  <circle cx="64" cy="70" r="41" fill="url(#dialGrad)"/>
+  <!-- Compass Marks -->
+  <circle cx="64" cy="70" r="3" fill="#0C4A6E"/>
+  <line x1="64" y1="33" x2="64" y2="40" stroke="#0284C7" stroke-width="3" stroke-linecap="round"/>
+  <line x1="64" y1="100" x2="64" y2="107" stroke="#0284C7" stroke-width="3" stroke-linecap="round"/>
+  <line x1="27" y1="70" x2="34" y2="70" stroke="#0284C7" stroke-width="3" stroke-linecap="round"/>
+  <line x1="94" y1="70" x2="101" y2="70" stroke="#0284C7" stroke-width="3" stroke-linecap="round"/>
+  <!-- Needle (Red North, White South) -->
+  <polygon points="64,36 71,70 64,66 57,70" fill="#EF4444" stroke="#991B1B" stroke-width="2"/>
+  <polygon points="64,104 71,70 64,74 57,70" fill="#FFFFFF" stroke="#64748B" stroke-width="2"/>
+  <!-- Center Pin -->
+  <circle cx="64" cy="70" r="6" fill="#FDE047" stroke="#854D0E" stroke-width="2"/>
+  <!-- Gloss reflection -->
+  <ellipse cx="50" cy="50" rx="20" ry="12" fill="#FFFFFF" opacity="0.35" transform="rotate(-30 50 50)"/>
+</svg>

@@ -1,46 +1,26 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/effects/muzzle_flash.gd" id="1_flash"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_core"]
-shading_mode = 0
-albedo_color = Color(1, 0.98, 0.7, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_core"]
-material = SubResource("StandardMaterial3D_core")
-radius = 0.3
-height = 0.6
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_star"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mesh"]
 blend_mode = 1
 shading_mode = 0
 billboard_mode = 1
-albedo_color = Color(1, 0.85, 0.25, 0.95)
+albedo_color = Color(1, 0.86, 0.25, 1)
 
-[sub_resource type="QuadMesh" id="QuadMesh_star"]
-material = SubResource("StandardMaterial3D_star")
-size = Vector2(1.6, 1.6)
+[sub_resource type="QuadMesh" id="QuadMesh_flash"]
+material = SubResource("StandardMaterial3D_mesh")
+size = Vector2(0.9, 0.9)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_streak"]
-blend_mode = 1
-shading_mode = 0
-billboard_mode = 1
-albedo_color = Color(1, 0.65, 0.15, 0.9)
-
-[sub_resource type="QuadMesh" id="QuadMesh_streak"]
-material = SubResource("StandardMaterial3D_streak")
-size = Vector2(2.4, 0.5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cone"]
-blend_mode = 1
-shading_mode = 0
-albedo_color = Color(1, 0.75, 0.2, 0.85)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_cone"]
-material = SubResource("StandardMaterial3D_cone")
-top_radius = 0.05
-bottom_radius = 0.45
-height = 0.9
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sparks"]
+direction = Vector3(0, 0, -1)
+spread = 16.0
+initial_velocity_min = 18.0
+initial_velocity_max = 30.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.6
+scale_max = 1.2
+color = Color(1, 0.82, 0.2, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
 shading_mode = 0
@@ -48,41 +28,77 @@ albedo_color = Color(1, 0.9, 0.35, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_spark"]
 material = SubResource("StandardMaterial3D_spark")
-size = Vector3(0.08, 0.08, 0.2)
+size = Vector3(0.06, 0.06, 0.25)
+
+[sub_resource type="Animation" id="Animation_fire"]
+resource_name = "fire"
+length = 0.06
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FlashMesh:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.06),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("FlashMesh:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.02, 0.06),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.4, 0.4, 0.4), Vector3(1.3, 1.3, 1.3), Vector3(0.01, 0.01, 0.01)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("OmniLight3D:light_energy")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.02, 0.06),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [1.8, 2.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_flash"]
+_data = {
+"fire": SubResource("Animation_fire")
+}
 
 [node name="MuzzleFlash" type="Node3D"]
 script = ExtResource("1_flash")
 
-[node name="FlashCore" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereMesh_core")
+[node name="FlashMesh" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("QuadMesh_flash")
 
-[node name="StarFlare" type="MeshInstance3D" parent="."]
-mesh = SubResource("QuadMesh_star")
-
-[node name="StreakFlare" type="MeshInstance3D" parent="."]
-mesh = SubResource("QuadMesh_streak")
-
-[node name="ConeFlare" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -0.45)
-mesh = SubResource("CylinderMesh_cone")
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+emitting = false
+amount = 8
+lifetime = 0.07
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_sparks")
+draw_pass_1 = SubResource("BoxMesh_spark")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 light_color = Color(1, 0.85, 0.3, 1)
-light_energy = 5.0
-omni_range = 8.0
-omni_attenuation = 1.3
+light_energy = 0.0
+omni_range = 2.5
+omni_attenuation = 1.5
 
-[node name="CPUParticles3D" type="CPUParticles3D" parent="."]
-emitting = false
-amount = 10
-lifetime = 0.09
-one_shot = true
-explosiveness = 0.95
-mesh = SubResource("BoxMesh_spark")
-direction = Vector3(0, 0, -1)
-spread = 24.0
-gravity = Vector3(0, 0, 0)
-initial_velocity_min = 16.0
-initial_velocity_max = 30.0
-scale_amount_min = 0.5
-scale_amount_max = 1.0
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_flash")
+}

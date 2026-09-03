@@ -5,8 +5,8 @@
 [node name="CameraRig" type="Node3D"]
 script = ExtResource("1_cam")
 lerp_weight_multiplier = 5.0
-pitch_degrees = -45.0
-base_fov = 68.0
+pitch_degrees = -18.0
+base_fov = 64.0
 
 [node name="SpringArm3D" type="SpringArm3D" parent="."]
 collision_mask = 0

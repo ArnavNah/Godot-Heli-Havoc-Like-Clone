@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <filter id="sndShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Speaker Body -->
+  <path d="M 24 48 L 44 48 L 74 22 C 78 18 86 22 86 28 L 86 100 C 86 106 78 110 74 106 L 44 80 L 24 80 C 18 80 14 76 14 70 L 14 58 C 14 52 18 48 24 48 Z" fill="#FFFFFF" filter="url(#sndShadow)"/>
+  <!-- Sound Waves -->
+  <path d="M 96 46 C 102 52 106 58 106 64 C 106 70 102 76 96 82" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" filter="url(#sndShadow)"/>
+  <path d="M 108 34 C 118 43 122 53 122 64 C 122 75 118 85 108 94" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" filter="url(#sndShadow)"/>
+</svg>

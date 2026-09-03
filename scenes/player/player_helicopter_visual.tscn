@@ -1,24 +1,24 @@
-[gd_scene format=3 uid="uid://c1pqchw2u4xaf"]
+[gd_scene load_steps=6 format=3 uid="uid://c1pqchw2u4xaf"]
 
-[ext_resource type="Script" uid="uid://dvobx448e1ykq" path="res://scripts/player/player_helicopter_visual.gd" id="1_vis"]
-[ext_resource type="PackedScene" uid="uid://dn5lddl4i7cp5" path="res://Player model/body.glb" id="2_body"]
-[ext_resource type="PackedScene" uid="uid://6rj0uvs8mr4r" path="res://Player model/top propeller.glb" id="3_top"]
-[ext_resource type="PackedScene" uid="uid://6qiybqqtsfbr" path="res://Player model/back propeller.glb" id="4_back"]
+[ext_resource type="Script" path="res://scripts/player/player_helicopter_visual.gd" id="1_vis"]
+[ext_resource type="PackedScene" path="res://Player model/body.glb" id="2_body"]
+[ext_resource type="PackedScene" path="res://Player model/top propeller.glb" id="3_top"]
+[ext_resource type="PackedScene" path="res://Player model/back propeller.glb" id="4_back"]
 
-[node name="PlayerHelicopterVisual" type="Node3D" unique_id=783821129]
+[node name="PlayerHelicopterVisual" type="Node3D"]
 script = ExtResource("1_vis")
 
-[node name="BodyRoot" type="Node3D" parent="." unique_id=609790423]
+[node name="BodyRoot" type="Node3D" parent="."]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
 
-[node name="BodyModel" parent="BodyRoot" unique_id=786650212 instance=ExtResource("2_body")]
+[node name="BodyModel" parent="BodyRoot" instance=ExtResource("2_body")]
 
-[node name="MainRotorPivot" type="Node3D" parent="." unique_id=2132266352]
+[node name="MainRotorPivot" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.435, -0.29)
 
-[node name="TopPropeller" parent="MainRotorPivot" unique_id=588615624 instance=ExtResource("3_top")]
+[node name="TopPropeller" parent="MainRotorPivot" instance=ExtResource("3_top")]
 
-[node name="TailRotorPivot" type="Node3D" parent="." unique_id=1459877269]
+[node name="TailRotorPivot" type="Node3D" parent="."]
 transform = Transform3D(-1.39876e-08, 0, -0.32, 0, 0.32, 0, 0.32, 0, -1.39876e-08, 0.1, 0.037, 0.86)
 
-[node name="BackPropeller" parent="TailRotorPivot" unique_id=334651124 instance=ExtResource("4_back")]
+[node name="BackPropeller" parent="TailRotorPivot" instance=ExtResource("4_back")]

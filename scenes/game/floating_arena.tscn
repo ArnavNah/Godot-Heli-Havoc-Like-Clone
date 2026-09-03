@@ -13,14 +13,8 @@ background_color = Color(0.35, 0.78, 0.98, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.65, 0.82, 0.98, 1)
 ambient_light_energy = 0.95
-tonemap_mode = 3
-tonemap_exposure = 1.08
-tonemap_white = 1.0
-glow_enabled = true
-glow_normalized = true
-glow_intensity = 0.9
-glow_bloom = 0.22
-glow_hdr_threshold = 0.95
+tonemap_mode = 0
+glow_enabled = false
 fog_enabled = true
 fog_mode = 1
 fog_light_color = Color(0.35, 0.78, 0.98, 1)
@@ -29,10 +23,7 @@ fog_height = 2.0
 fog_height_density = 0.08
 fog_depth_begin = 45.0
 fog_depth_end = 220.0
-adjustment_enabled = true
-adjustment_brightness = 1.02
-adjustment_contrast = 1.18
-adjustment_saturation = 1.25
+adjustment_enabled = false
 
 [node name="CityArena" type="Node3D"]
 script = ExtResource("1_arena")
@@ -43,7 +34,8 @@ environment = SubResource("Environment_arena")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.766044, -0.422618, 0.485121, 0, 0.75471, 0.656059, -0.642788, -0.50257, 0.578142, 0, 60, 0)
 light_color = Color(1, 0.98, 0.95, 1)
-light_energy = 1.25
+light_energy = 1.15
+light_specular = 0.1
 shadow_enabled = true
 shadow_bias = 0.05
 

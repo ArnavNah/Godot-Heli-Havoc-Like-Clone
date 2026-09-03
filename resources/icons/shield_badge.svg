@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="shdGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E0F2FE"/>
+      <stop offset="40%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <filter id="shdShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Shield Outline -->
+  <path d="M 64 12 L 108 24 C 108 68 88 102 64 116 C 40 102 20 68 20 24 Z" fill="url(#shdGrad)" stroke="#0C4A6E" stroke-width="7" stroke-linejoin="round" filter="url(#shdShadow)"/>
+  <!-- Inner Rim -->
+  <path d="M 64 22 L 98 32 C 98 68 82 94 64 106 C 46 94 30 68 30 32 Z" fill="none" stroke="#BAE6FD" stroke-width="4" stroke-linejoin="round"/>
+</svg>

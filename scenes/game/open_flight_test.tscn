@@ -1,0 +1,66 @@
+[gd_scene load_steps=9 format=3 uid="uid://copen_flight_test_01"]
+
+[ext_resource type="PackedScene" uid="uid://cityarena001" path="res://scenes/game/city_arena.tscn" id="1_arena"]
+[ext_resource type="PackedScene" uid="uid://dmxh026y3b8tq" path="res://scenes/player/player_heli.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://c8camrig001" path="res://scenes/player/camera_rig.tscn" id="3_cam"]
+[ext_resource type="PackedScene" uid="uid://bheli_hud_scene" path="res://scenes/ui/heli_hud.tscn" id="4_hud"]
+
+[sub_resource type="Environment" id="Environment_open"]
+background_mode = 1
+background_color = Color(0, 0.92, 0.98, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.45, 0.85, 1, 1)
+ambient_light_energy = 0.95
+tonemap_mode = 0
+glow_enabled = false
+fog_enabled = true
+fog_light_color = Color(0.1, 0.82, 0.95, 1)
+fog_light_energy = 0.9
+fog_density = 0.004
+fog_height = 8.0
+fog_height_density = 0.08
+fog_depth_begin = 35.0
+fog_depth_end = 220.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.12, 0.35, 0.65, 1)
+metallic = 0.1
+roughness = 0.8
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+material = SubResource("StandardMaterial3D_ground")
+size = Vector2(400, 400)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(400, 2, 400)
+
+[node name="OpenFlightTest" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_open")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.766044, -0.422618, 0.485121, 0, 0.75471, 0.656059, -0.642788, -0.50257, 0.578142, 0, 60, 0)
+light_color = Color(1, 0.98, 0.95, 1)
+light_energy = 1.15
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="."]
+collision_layer = 2
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("PlaneMesh_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="PlayerHeli" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+
+[node name="CameraRig" parent="." instance=ExtResource("3_cam")]
+target_path = NodePath("../PlayerHeli")
+
+[node name="HeliHUD" parent="." instance=ExtResource("4_hud")]
+player_path = NodePath("../PlayerHeli")

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="rktRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF4D4D"/>
+      <stop offset="50%" stop-color="#EF4444"/>
+      <stop offset="100%" stop-color="#B91C1C"/>
+    </linearGradient>
+    <filter id="rktShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Rocket Body angled at 45 deg -->
+  <g transform="rotate(45 64 64)" filter="url(#rktShadow)">
+    <!-- Exhaust Flames -->
+    <polygon points="56,104 64,124 72,104" fill="#F59E0B"/>
+    <polygon points="59,104 64,118 69,104" fill="#FEF08A"/>
+    <!-- Fins -->
+    <path d="M 40 84 L 28 98 L 44 98 Z" fill="#3B82F6" stroke="#1E3A8A" stroke-width="3"/>
+    <path d="M 88 84 L 100 98 L 84 98 Z" fill="#3B82F6" stroke="#1E3A8A" stroke-width="3"/>
+    <!-- Main Fuselage -->
+    <path d="M 64 8 C 46 36 46 86 46 102 L 82 102 C 82 86 82 36 64 8 Z" fill="#FFFFFF" stroke="#1E293B" stroke-width="5" stroke-linejoin="round"/>
+    <!-- Red Nose Cone -->
+    <path d="M 64 8 C 55 24 50 38 48 50 L 80 50 C 78 38 73 24 64 8 Z" fill="url(#rktRed)" stroke="#1E293B" stroke-width="4"/>
+    <!-- Blue Porthole Window -->
+    <circle cx="64" cy="68" r="10" fill="#38BDF8" stroke="#0284C7" stroke-width="3"/>
+    <circle cx="62" cy="66" r="3" fill="#FFFFFF"/>
+    <!-- Red Bottom Stripe -->
+    <rect x="46" y="92" width="36" height="8" fill="url(#rktRed)"/>
+  </g>
+</svg>

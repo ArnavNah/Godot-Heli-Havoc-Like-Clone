@@ -5,10 +5,10 @@ class_name CameraRig
 
 @export_group("Decoupled World-Space Camera")
 @export var follow_speed: float = 12.0
-@export var pitch_degrees: float = -44.0
-@export var height_offset: float = 8.5
-@export var back_offset: float = 10.0
-@export var base_fov: float = 68.0
+@export var pitch_degrees: float = -18.0
+@export var height_offset: float = 4.2
+@export var back_offset: float = 7.8
+@export var base_fov: float = 64.0
 @export var max_fov_kick: float = 4.5
 @export var look_ahead_strength: float = 0.06
 
@@ -72,9 +72,9 @@ func _process(delta: float) -> void:
 	var desired_cam_pos = target_origin + Vector3(0, height_offset, back_offset)
 	var cur_speed = 0.0
 	
-	if target is CharacterBody3D:
-		var cb = target as CharacterBody3D
-		var h_vel = Vector3(cb.velocity.x, 0.0, cb.velocity.z)
+	if target is RigidBody3D:
+		var rigid_player = target as RigidBody3D
+		var h_vel = Vector3(rigid_player.linear_velocity.x, 0.0, rigid_player.linear_velocity.z)
 		cur_speed = h_vel.length()
 		desired_cam_pos += h_vel * look_ahead_strength
 	

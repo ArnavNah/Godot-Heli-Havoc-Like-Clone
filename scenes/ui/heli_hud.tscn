@@ -1,252 +1,316 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/heli_hud.gd" id="1_hud"]
-[ext_resource type="PackedScene" path="res://scenes/ui/mobile_controls.tscn" id="2_mob"]
-[ext_resource type="Material" path="res://resources/shaders/arcade_post_process.tres" id="3_post"]
+[ext_resource type="Theme" path="res://resources/themes/heli_theme.tres" id="2_theme"]
+[ext_resource type="FontFile" path="res://resources/fonts/cartoon_bold.ttf" id="3_font"]
+[ext_resource type="Texture2D" path="res://resources/icons/compass.svg" id="5_compass"]
+[ext_resource type="Texture2D" path="res://resources/icons/coin.svg" id="6_coin"]
+[ext_resource type="Texture2D" path="res://resources/icons/skull.svg" id="7_skull"]
+[ext_resource type="Texture2D" path="res://resources/icons/stopwatch.svg" id="8_clock"]
+[ext_resource type="Texture2D" path="res://resources/icons/menu_bars.svg" id="9_menu"]
+[ext_resource type="Texture2D" path="res://resources/icons/heart.svg" id="10_heart"]
+[ext_resource type="Texture2D" path="res://resources/icons/gas_can.svg" id="11_gas"]
+[ext_resource type="Texture2D" path="res://resources/icons/shield_badge.svg" id="12_shield"]
+[ext_resource type="Texture2D" path="res://resources/icons/rocket.svg" id="13_rocket"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_bar"]
-bg_color = Color(0.06, 0.1, 0.18, 0.85)
-border_width_bottom = 2
-border_color = Color(0.2, 0.5, 0.85, 0.8)
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="LabelSettings" id="LabelSettings_lvl"]
-font_size = 18
+[sub_resource type="LabelSettings" id="LabelSettings_counter"]
+font = ExtResource("3_font")
+font_size = 20
 font_color = Color(1, 1, 1, 1)
-outline_size = 4
-outline_color = Color(0.05, 0.05, 0.05, 1)
+outline_size = 6
+outline_color = Color(0.06, 0.08, 0.15, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_bg"]
-bg_color = Color(0.1, 0.15, 0.25, 0.9)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.25, 0.55, 0.9, 0.9)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_fill"]
-bg_color = Color(0.2, 0.7, 1, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[sub_resource type="LabelSettings" id="LabelSettings_xp"]
-font_size = 13
-font_color = Color(1, 1, 1, 1)
-outline_size = 3
-outline_color = Color(0.05, 0.05, 0.05, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_stat"]
-font_size = 18
-font_color = Color(1, 1, 1, 1)
-outline_size = 4
-outline_color = Color(0.05, 0.05, 0.05, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_gold"]
-font_size = 18
-font_color = Color(1, 0.88, 0.15, 1)
-outline_size = 4
-outline_color = Color(0.05, 0.05, 0.05, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
-bg_color = Color(0.25, 0.05, 0.05, 0.9)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 3
-border_color = Color(0.12, 0.02, 0.02, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
-bg_color = Color(0.95, 0.2, 0.18, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fuel_bg"]
-bg_color = Color(0.25, 0.2, 0.02, 0.9)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 3
-border_color = Color(0.12, 0.08, 0.01, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fuel_fill"]
-bg_color = Color(1, 0.8, 0.1, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_game_over"]
-bg_color = Color(0.06, 0.09, 0.18, 0.96)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wave_bg"]
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+bg_color = Color(0.12, 0.38, 0.46, 0.9)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
-border_width_bottom = 5
-border_color = Color(0.9, 0.2, 0.2, 1)
+border_width_bottom = 3
+border_color = Color(0.06, 0.16, 0.22, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wave_fill"]
+bg_color = Color(0.2, 0.8, 0.75, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="LabelSettings" id="LabelSettings_time"]
+font = ExtResource("3_font")
+font_size = 22
+font_color = Color(1, 1, 1, 1)
+outline_size = 6
+outline_color = Color(0.05, 0.08, 0.18, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_btn"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.2, 0.52, 0.85, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.08, 0.18, 0.42, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 1
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.08, 0.08, 0.15, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.04, 0.04, 0.08, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.96, 0.22, 0.2, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fuel_fill"]
+bg_color = Color(1, 0.78, 0.12, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="LabelSettings" id="LabelSettings_bar_val"]
+font = ExtResource("3_font")
+font_size = 20
+font_color = Color(1, 1, 1, 1)
+outline_size = 6
+outline_color = Color(0.05, 0.05, 0.08, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stats_bg"]
+content_margin_left = 32.0
+content_margin_top = 28.0
+content_margin_right = 32.0
+content_margin_bottom = 32.0
+bg_color = Color(0.06, 0.22, 0.45, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(0.03, 0.1, 0.22, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 4
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stats_banner"]
+content_margin_left = 24.0
+content_margin_top = 8.0
+content_margin_right = 24.0
+content_margin_bottom = 10.0
+bg_color = Color(0.2, 0.8, 0.25, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.08, 0.45, 0.12, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 2
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stat_card"]
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 14.0
+bg_color = Color(0.08, 0.35, 0.65, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.04, 0.18, 0.35, 1)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="LabelSettings" id="LabelSettings_go_title"]
-font_size = 42
-font_color = Color(1, 0.25, 0.25, 1)
-outline_size = 8
-outline_color = Color(0.1, 0.02, 0.02, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_go_stats"]
-font_size = 18
-font_color = Color(1, 1, 1, 1)
-outline_size = 4
-outline_color = Color(0.05, 0.05, 0.05, 1)
-line_spacing = 6.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_restart"]
-bg_color = Color(0.1, 0.8, 0.3, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 4
-border_color = Color(0.04, 0.45, 0.15, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_menu"]
-bg_color = Color(0.25, 0.5, 0.9, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 4
-border_color = Color(0.1, 0.25, 0.6, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="LabelSettings" id="LabelSettings_countdown"]
-font_size = 96
-font_color = Color(1, 0.9, 0.1, 1)
-outline_size = 16
-outline_color = Color(0.06, 0.08, 0.2, 1)
-shadow_size = 12
-shadow_color = Color(0, 0, 0, 0.7)
-shadow_offset = Vector2(4, 6)
-
 [node name="HeliHUD" type="CanvasLayer"]
-process_mode = 3
 script = ExtResource("1_hud")
 
-[node name="PostProcessEffect" type="ColorRect" parent="."]
-material = ExtResource("3_post")
+[node name="TopBar" type="Control" parent="."]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-
-[node name="TopBar" type="PanelContainer" parent="."]
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 54.0
-grow_horizontal = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_top_bar")
+theme = ExtResource("2_theme")
 
 [node name="Margin" type="MarginContainer" parent="TopBar"]
-layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 8
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 160.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 28
 
-[node name="HBox" type="HBoxContainer" parent="TopBar/Margin"]
+[node name="LeftColumn" type="VBoxContainer" parent="TopBar/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 28
-alignment = 1
+size_flags_horizontal = 0
 
-[node name="LevelContainer" type="HBoxContainer" parent="TopBar/Margin/HBox"]
+[node name="Counters" type="VBoxContainer" parent="TopBar/Margin/LeftColumn"]
 layout_mode = 2
+theme_override_constants/separation = 4
 
-[node name="LevelLabel" type="Label" parent="TopBar/Margin/HBox/LevelContainer"]
+[node name="DistCounter" type="HBoxContainer" parent="TopBar/Margin/LeftColumn/Counters"]
 layout_mode = 2
-text = "LVL 1"
-label_settings = SubResource("LabelSettings_lvl")
+theme_override_constants/separation = 8
 
-[node name="XPContainer" type="HBoxContainer" parent="TopBar/Margin/HBox"]
-custom_minimum_size = Vector2(220, 0)
+[node name="Icon" type="TextureRect" parent="TopBar/Margin/LeftColumn/Counters/DistCounter"]
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
-size_flags_horizontal = 3
+texture = ExtResource("5_compass")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="XPBar" type="ProgressBar" parent="TopBar/Margin/HBox/XPContainer"]
-custom_minimum_size = Vector2(0, 18)
+[node name="Label" type="Label" parent="TopBar/Margin/LeftColumn/Counters/DistCounter"]
 layout_mode = 2
-size_flags_horizontal = 3
+text = "0.0m"
+label_settings = SubResource("LabelSettings_counter")
+
+[node name="CoinCounter" type="HBoxContainer" parent="TopBar/Margin/LeftColumn/Counters"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="TopBar/Margin/LeftColumn/Counters/CoinCounter"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+texture = ExtResource("6_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="TopBar/Margin/LeftColumn/Counters/CoinCounter"]
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_counter")
+
+[node name="ElimsCounter" type="HBoxContainer" parent="TopBar/Margin/LeftColumn/Counters"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="TopBar/Margin/LeftColumn/Counters/ElimsCounter"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+texture = ExtResource("7_skull")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="TopBar/Margin/LeftColumn/Counters/ElimsCounter"]
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_counter")
+
+[node name="CenterWaveVBox" type="VBoxContainer" parent="TopBar/Margin"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_constants/separation = 6
+
+[node name="WaveBarHBox" type="HBoxContainer" parent="TopBar/Margin/CenterWaveVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Badge" type="TextureRect" parent="TopBar/Margin/CenterWaveVBox/WaveBarHBox"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+texture = ExtResource("12_shield")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="XPBar" type="ProgressBar" parent="TopBar/Margin/CenterWaveVBox/WaveBarHBox"]
+custom_minimum_size = Vector2(220, 18)
+layout_mode = 2
 size_flags_vertical = 4
-theme_override_styles/background = SubResource("StyleBoxFlat_xp_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_xp_fill")
-max_value = 15.0
+theme_override_styles/background = SubResource("StyleBoxFlat_wave_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_wave_fill")
+value = 50.0
 show_percentage = false
 
-[node name="XPLabel" type="Label" parent="TopBar/Margin/HBox/XPContainer/XPBar"]
+[node name="XPLabel" type="Label" parent="TopBar/Margin/CenterWaveVBox/WaveBarHBox/XPBar"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "XP 0 / 15"
-label_settings = SubResource("LabelSettings_xp")
-horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="TimeContainer" type="HBoxContainer" parent="TopBar/Margin/HBox"]
+[node name="TimeHBox" type="HBoxContainer" parent="TopBar/Margin/CenterWaveVBox"]
 layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
 
-[node name="TimeLabel" type="Label" parent="TopBar/Margin/HBox/TimeContainer"]
+[node name="ClockIcon" type="TextureRect" parent="TopBar/Margin/CenterWaveVBox/TimeHBox"]
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-text = "⏱ TIME: 00:00"
-label_settings = SubResource("LabelSettings_stat")
+texture = ExtResource("8_clock")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="CoinContainer" type="HBoxContainer" parent="TopBar/Margin/HBox"]
+[node name="TimeLabel" type="Label" parent="TopBar/Margin/CenterWaveVBox/TimeHBox"]
 layout_mode = 2
+text = "00:00"
+label_settings = SubResource("LabelSettings_time")
 
-[node name="CoinLabel" type="Label" parent="TopBar/Margin/HBox/CoinContainer"]
+[node name="PauseButton" type="Button" parent="TopBar/Margin"]
+process_mode = 3
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-text = "🪙 COINS: 0"
-label_settings = SubResource("LabelSettings_gold")
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_btn")
+icon = ExtResource("9_menu")
+icon_alignment = 1
+expand_icon = true
 
 [node name="BottomBar" type="Control" parent="."]
 layout_mode = 3
-anchors_preset = 7
-anchor_left = 0.5
+anchors_preset = 12
 anchor_top = 1.0
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -210.0
-offset_top = -60.0
-offset_right = 210.0
-offset_bottom = -16.0
+offset_top = -80.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
+theme = ExtResource("2_theme")
 
 [node name="Margin" type="MarginContainer" parent="BottomBar"]
 layout_mode = 1
@@ -255,24 +319,32 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_bottom = 22
 
 [node name="HBox" type="HBoxContainer" parent="BottomBar/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 22
 
-[node name="HealthContainer" type="Control" parent="BottomBar/Margin/HBox"]
+[node name="HealthContainer" type="HBoxContainer" parent="BottomBar/Margin/HBox"]
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_constants/separation = -10
+
+[node name="HeartBadge" type="TextureRect" parent="BottomBar/Margin/HBox/HealthContainer"]
+z_index = 2
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("10_heart")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="HealthBar" type="ProgressBar" parent="BottomBar/Margin/HBox/HealthContainer"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
+custom_minimum_size = Vector2(170, 36)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 value = 100.0
 show_percentage = false
@@ -284,23 +356,20 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "❤️ 100 / 100"
-label_settings = SubResource("LabelSettings_stat")
+text = "100"
+label_settings = SubResource("LabelSettings_bar_val")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FuelContainer" type="Control" parent="BottomBar/Margin/HBox"]
+[node name="FuelContainer" type="HBoxContainer" parent="BottomBar/Margin/HBox"]
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_constants/separation = -10
 
 [node name="FuelBar" type="ProgressBar" parent="BottomBar/Margin/HBox/FuelContainer"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_fuel_bg")
+custom_minimum_size = Vector2(170, 36)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_fuel_fill")
 value = 100.0
 show_percentage = false
@@ -312,14 +381,22 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "⚡ 100%"
-label_settings = SubResource("LabelSettings_stat")
+text = "100%"
+label_settings = SubResource("LabelSettings_bar_val")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MobileControls" parent="." instance=ExtResource("2_mob")]
+[node name="GasBadge" type="TextureRect" parent="BottomBar/Margin/HBox/FuelContainer"]
+z_index = 2
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("11_gas")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="CountdownOverlay" type="Control" parent="."]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -335,74 +412,225 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -80.0
-offset_right = 200.0
-offset_bottom = 80.0
+offset_left = -150.0
+offset_top = -60.0
+offset_right = 150.0
+offset_bottom = 60.0
 grow_horizontal = 2
 grow_vertical = 2
-pivot_offset = Vector2(200, 80)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 80
 text = "3"
-label_settings = SubResource("LabelSettings_countdown")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GameOverModal" type="PanelContainer" parent="."]
+[node name="GameOverModal" type="Control" parent="."]
 visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -180.0
-offset_top = -140.0
-offset_right = 180.0
-offset_bottom = 140.0
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_game_over")
+theme = ExtResource("2_theme")
 
-[node name="Margin" type="MarginContainer" parent="GameOverModal"]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
+[node name="Backdrop" type="ColorRect" parent="GameOverModal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.08, 0.18, 0.85)
 
-[node name="VBox" type="VBoxContainer" parent="GameOverModal/Margin"]
+[node name="Center" type="CenterContainer" parent="GameOverModal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="GameOverModal/Center"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_styles/panel = SubResource("StyleBoxFlat_stats_bg")
+
+[node name="Margin" type="MarginContainer" parent="GameOverModal/Center/Panel"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="GameOverModal/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 18
 alignment = 1
 
-[node name="Title" type="Label" parent="GameOverModal/Margin/VBox"]
+[node name="BannerHBox" type="HBoxContainer" parent="GameOverModal/Center/Panel/Margin/VBox"]
 layout_mode = 2
-text = "GAME OVER"
-label_settings = SubResource("LabelSettings_go_title")
-horizontal_alignment = 1
-
-[node name="StatsLabel" type="Label" parent="GameOverModal/Margin/VBox"]
-layout_mode = 2
-text = "SURVIVAL TIME: 00:00
-COINS EARNED: 0
-FINAL SCORE: 0"
-label_settings = SubResource("LabelSettings_go_stats")
-horizontal_alignment = 1
-
-[node name="BtnHBox" type="HBoxContainer" parent="GameOverModal/Margin/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 14
 alignment = 1
 
-[node name="RestartButton" type="Button" parent="GameOverModal/Margin/VBox/BtnHBox"]
-custom_minimum_size = Vector2(130, 42)
+[node name="BannerPanel" type="PanelContainer" parent="GameOverModal/Center/Panel/Margin/VBox/BannerHBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_restart")
-text = "RESTART"
+theme_override_styles/panel = SubResource("StyleBoxFlat_stats_banner")
 
-[node name="MenuButton" type="Button" parent="GameOverModal/Margin/VBox/BtnHBox"]
-custom_minimum_size = Vector2(130, 42)
+[node name="TitleLabel" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/BannerHBox/BannerPanel"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_menu")
-text = "MAIN MENU"
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 28
+text = "Stats"
+horizontal_alignment = 1
+
+[node name="TimeHBox" type="HBoxContainer" parent="GameOverModal/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="ClockIcon" type="TextureRect" parent="GameOverModal/Center/Panel/Margin/VBox/TimeHBox"]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+texture = ExtResource("8_clock")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TimeValLabel" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/TimeHBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 38
+text = "0.0"
+
+[node name="CardsHBox" type="HBoxContainer" parent="GameOverModal/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="DistCard" type="PanelContainer" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox"]
+custom_minimum_size = Vector2(105, 115)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat_card")
+
+[node name="VBox" type="VBoxContainer" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/DistCard"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/DistCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Distance"
+horizontal_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/DistCard/VBox"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+texture = ExtResource("5_compass")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ValLabel" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/DistCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "0.0m"
+horizontal_alignment = 1
+
+[node name="GoldCard" type="PanelContainer" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox"]
+custom_minimum_size = Vector2(105, 115)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat_card")
+
+[node name="VBox" type="VBoxContainer" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/GoldCard"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/GoldCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Gold"
+horizontal_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/GoldCard/VBox"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+texture = ExtResource("6_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ValLabel" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/GoldCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "0"
+horizontal_alignment = 1
+
+[node name="ElimsCard" type="PanelContainer" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox"]
+custom_minimum_size = Vector2(105, 115)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat_card")
+
+[node name="VBox" type="VBoxContainer" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/ElimsCard"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/ElimsCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Elims"
+horizontal_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/ElimsCard/VBox"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+texture = ExtResource("7_skull")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ValLabel" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/CardsHBox/ElimsCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "0"
+horizontal_alignment = 1
+
+[node name="LvlProgressHBox" type="HBoxContainer" parent="GameOverModal/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="LeftBadge" type="PanelContainer" parent="GameOverModal/Center/Panel/Margin/VBox/LvlProgressHBox"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/LvlProgressHBox/LeftBadge"]
+layout_mode = 2
+text = "1"
+horizontal_alignment = 1
+
+[node name="LvlBar" type="ProgressBar" parent="GameOverModal/Center/Panel/Margin/VBox/LvlProgressHBox"]
+custom_minimum_size = Vector2(220, 14)
+layout_mode = 2
+size_flags_vertical = 4
+value = 40.0
+show_percentage = false
+
+[node name="RightBadge" type="PanelContainer" parent="GameOverModal/Center/Panel/Margin/VBox/LvlProgressHBox"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox/LvlProgressHBox/RightBadge"]
+layout_mode = 2
+text = "2"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="GameOverModal/Center/Panel/Margin/VBox"]
+visible = false
+layout_mode = 2
+text = ""
+
+[node name="BtnHBox" type="HBoxContainer" parent="GameOverModal/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="MenuButton" type="Button" parent="GameOverModal/Center/Panel/Margin/VBox/BtnHBox"]
+custom_minimum_size = Vector2(140, 46)
+layout_mode = 2
+text = "Main Menu"
+
+[node name="RestartButton" type="Button" parent="GameOverModal/Center/Panel/Margin/VBox/BtnHBox"]
+custom_minimum_size = Vector2(140, 46)
+layout_mode = 2
+text = "Play Again"

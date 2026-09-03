@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="heartGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FF6B6B"/>
+      <stop offset="45%" stop-color="#EF4444"/>
+      <stop offset="85%" stop-color="#DC2626"/>
+      <stop offset="100%" stop-color="#991B1B"/>
+    </radialGradient>
+    <filter id="hShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <!-- Heart Shape -->
+  <path d="M 64 116 C 60 116 20 84 10 56 C 2 34 16 14 40 14 C 52 14 60 20 64 28 C 68 20 76 14 88 14 C 112 14 126 34 118 56 C 108 84 68 116 64 116 Z" fill="url(#heartGrad)" stroke="#450A0A" stroke-width="7" stroke-linejoin="round" filter="url(#hShadow)"/>
+  <!-- Inner Highlight Curve -->
+  <path d="M 24 46 C 20 32 30 22 42 22 C 48 22 56 26 60 34" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+  <!-- Specular Reflection Dot -->
+  <circle cx="34" cy="30" r="4" fill="#FFFFFF" opacity="0.8"/>
+</svg>

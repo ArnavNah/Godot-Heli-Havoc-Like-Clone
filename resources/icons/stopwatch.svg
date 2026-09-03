@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="swFace" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="70%" stop-color="#F1F5F9"/>
+      <stop offset="100%" stop-color="#CBD5E1"/>
+    </radialGradient>
+    <filter id="swShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Top Button & Ring -->
+  <rect x="56" y="8" width="16" height="12" rx="3" fill="#64748B" stroke="#0F172A" stroke-width="4"/>
+  <rect x="52" y="4" width="24" height="8" rx="4" fill="#94A3B8" stroke="#0F172A" stroke-width="3"/>
+  <!-- Side Buttons -->
+  <rect x="94" y="24" width="14" height="8" rx="3" transform="rotate(45 101 28)" fill="#94A3B8" stroke="#0F172A" stroke-width="3"/>
+  <!-- Main Body Outer Rim -->
+  <circle cx="64" cy="72" r="50" fill="#334155" stroke="#0F172A" stroke-width="6" filter="url(#swShadow)"/>
+  <circle cx="64" cy="72" r="44" fill="#94A3B8"/>
+  <circle cx="64" cy="72" r="41" fill="url(#swFace)" stroke="#0F172A" stroke-width="3"/>
+  <!-- Dial Ticks -->
+  <line x1="64" y1="36" x2="64" y2="44" stroke="#0F172A" stroke-width="4" stroke-linecap="round"/>
+  <line x1="64" y1="100" x2="64" y2="108" stroke="#64748B" stroke-width="3" stroke-linecap="round"/>
+  <line x1="28" y1="72" x2="36" y2="72" stroke="#64748B" stroke-width="3" stroke-linecap="round"/>
+  <line x1="92" y1="72" x2="100" y2="72" stroke="#64748B" stroke-width="3" stroke-linecap="round"/>
+  <!-- Stopwatch Hand pointing at 1 o'clock -->
+  <line x1="64" y1="72" x2="82" y2="48" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="64" cy="72" r="5" fill="#EF4444" stroke="#991B1B" stroke-width="2"/>
+  <!-- Glass Highlight -->
+  <ellipse cx="50" cy="54" rx="16" ry="9" fill="#FFFFFF" opacity="0.6" transform="rotate(-30 50 54)"/>
+</svg>

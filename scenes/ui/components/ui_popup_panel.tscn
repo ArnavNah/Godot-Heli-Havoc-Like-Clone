@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3 uid="uid://cui_popup_panel"]
+
+[ext_resource type="Theme" uid="uid://c6heli_theme_res" path="res://resources/themes/heli_theme.tres" id="1_theme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_popup"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.0156863, 0.45098, 0.72549, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.0352941, 0.207843, 0.333333, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+corner_detail = 8
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 3
+shadow_offset = Vector2(0, 6)
+
+[node name="UIPopupPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(300, 200)
+theme = ExtResource("1_theme")
+theme_override_styles/panel = SubResource("StyleBoxFlat_popup")

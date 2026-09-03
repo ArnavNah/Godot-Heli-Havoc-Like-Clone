@@ -1,70 +1,59 @@
-[gd_scene load_steps=8 format=3 uid="uid://cityarena001"]
+[gd_scene format=3 uid="uid://cityarena001"]
 
-[ext_resource type="Script" path="res://scripts/game/treadmill_level.gd" id="1_arena"]
-[ext_resource type="Script" path="res://scripts/environment/city_grid_manager.gd" id="2_grid"]
-[ext_resource type="PackedScene" path="res://scenes/player/player_heli.tscn" id="3_player"]
+[ext_resource type="Script" uid="uid://cdcqjjcwb1i7t" path="res://scripts/game/treadmill_level.gd" id="1_arena"]
+[ext_resource type="Script" uid="uid://b04st2hkvi07c" path="res://scripts/environment/city_grid_manager.gd" id="2_grid"]
+[ext_resource type="PackedScene" uid="uid://dmxh026y3b8tq" path="res://scenes/player/player_heli.tscn" id="3_player"]
 [ext_resource type="PackedScene" path="res://scenes/player/camera_rig.tscn" id="4_cam"]
 [ext_resource type="PackedScene" path="res://scenes/ui/heli_hud.tscn" id="5_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_up_screen.tscn" id="6_lvlup"]
 
 [sub_resource type="Environment" id="Environment_arena"]
 background_mode = 1
-background_color = Color(0, 0.92, 0.98, 1)
+background_color = Color(0.12, 0.72, 0.96, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.45, 0.85, 1, 1)
-ambient_light_energy = 0.95
-tonemap_mode = 3
-tonemap_exposure = 1.08
-tonemap_white = 1.0
-glow_enabled = true
-glow_normalized = true
-glow_intensity = 0.9
-glow_bloom = 0.22
-glow_hdr_threshold = 0.95
+ambient_light_color = Color(0.85, 0.9, 1, 1)
+ambient_light_energy = 0.7
 fog_enabled = true
-fog_light_color = Color(0.1, 0.82, 0.95, 1)
-fog_light_energy = 0.9
-fog_density = 0.006
-fog_sky_affect = 1.0
-fog_height = 8.0
-fog_height_density = 0.08
-fog_depth_curve = 0.8
-fog_depth_begin = 25.0
-fog_depth_end = 160.0
-adjustment_enabled = true
-adjustment_brightness = 1.02
-adjustment_contrast = 1.18
-adjustment_saturation = 1.25
+fog_light_color = Color(0.15, 0.85, 0.98, 1)
+fog_light_energy = 0.6
+fog_density = 0.002
+fog_sky_affect = 0.3
+fog_height = 4.0
+fog_height_density = 0.04
+fog_depth_begin = 40.0
+fog_depth_end = 260.0
 
-[node name="CityArena" type="Node3D"]
+[node name="CityArena" type="Node3D" unique_id=164227955]
 script = ExtResource("1_arena")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1645351652]
 environment = SubResource("Environment_arena")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.766044, -0.422618, 0.485121, 0, 0.75471, 0.656059, -0.642788, -0.50257, 0.578142, 0, 60, 0)
-light_color = Color(1, 0.98, 0.95, 1)
-light_energy = 1.35
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1646796107]
+transform = Transform3D(0.819152, -0.383022, 0.426786, 0, 0.743145, 0.669131, -0.573576, -0.548121, 0.608747, 0, 60, 0)
+light_color = Color(1, 0.98, 0.92, 1)
+light_energy = 1.25
+light_specular = 0.2
 shadow_enabled = true
-shadow_bias = 0.05
+shadow_bias = 0.04
 
-[node name="CityGridManager" type="Node3D" parent="."]
+[node name="CityGridManager" type="Node3D" parent="." unique_id=1091303509]
 script = ExtResource("2_grid")
 target_player_path = NodePath("../PlayerHeli")
 
-[node name="PlayerHeli" parent="." instance=ExtResource("3_player")]
+[node name="PlayerHeli" parent="." unique_id=388301180 instance=ExtResource("3_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 0)
 
-[node name="CameraRig" parent="." instance=ExtResource("4_cam")]
+[node name="CameraRig" parent="." unique_id=453333292 instance=ExtResource("4_cam")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18, 0)
 target_path = NodePath("../PlayerHeli")
 
-[node name="HeliHUD" parent="." instance=ExtResource("5_hud")]
+[node name="HeliHUD" parent="." unique_id=841827593 instance=ExtResource("5_hud")]
 player_path = NodePath("../PlayerHeli")
 
-[node name="LevelUpCanvasLayer" type="CanvasLayer" parent="."]
+[node name="LevelUpCanvasLayer" type="CanvasLayer" parent="." unique_id=1066549501]
 process_mode = 3
 layer = 20
+visible = false
 
-[node name="LevelUpScreen" parent="LevelUpCanvasLayer" instance=ExtResource("6_lvlup")]
+[node name="LevelUpScreen" parent="LevelUpCanvasLayer" unique_id=359964614 instance=ExtResource("6_lvlup")]

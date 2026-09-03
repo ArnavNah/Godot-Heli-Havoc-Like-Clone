@@ -1,10 +1,15 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3 uid="uid://dmxh026y3b8tq"]
 
 [ext_resource type="Script" path="res://scripts/player/player_heli.gd" id="1_heli"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="2_health"]
 [ext_resource type="Script" path="res://scripts/components/fuel_component.gd" id="3_fuel"]
 [ext_resource type="Script" path="res://scripts/components/progression_component.gd" id="4_prog"]
 [ext_resource type="PackedScene" path="res://scenes/player/player_helicopter_visual.tscn" id="5_visual"]
+[ext_resource type="PackedScene" path="res://scenes/effects/muzzle_flash.tscn" id="6_flash"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_heli"]
+friction = 0.2
+bounce = 0.05
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_col"]
 radius = 0.85
@@ -13,10 +18,17 @@ height = 3.0
 [sub_resource type="BoxShape3D" id="BoxShape3D_crash"]
 size = Vector3(2.6, 1.8, 3.4)
 
-[node name="PlayerHeli" type="CharacterBody3D"]
+[node name="PlayerHeli" type="RigidBody3D"]
 collision_layer = 1
 collision_mask = 22
-motion_mode = 1
+mass = 60.0
+physics_material_override = SubResource("PhysicsMaterial_heli")
+gravity_scale = 1.0
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
+linear_damp = 0.5
+angular_damp = 2.0
 script = ExtResource("1_heli")
 
 [node name="HealthComponent" type="Node" parent="."]
@@ -32,22 +44,20 @@ script = ExtResource("4_prog")
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_col")
 
-[node name="VisualYawRoot" type="Node3D" parent="."]
-
-[node name="BankingRoot" type="Node3D" parent="VisualYawRoot"]
-
-[node name="HoverVisualRoot" type="Node3D" parent="VisualYawRoot/BankingRoot"]
-
-[node name="PlayerHelicopterVisual" parent="VisualYawRoot/BankingRoot/HoverVisualRoot" instance=ExtResource("5_visual")]
+[node name="HelicopterVisual" parent="." instance=ExtResource("5_visual")]
 transform = Transform3D(1.65, 0, 0, 0, 1.65, 0, 0, 0, 1.65, 0, 0, 0)
 
-[node name="WeaponMounts" type="Node3D" parent="VisualYawRoot/BankingRoot/HoverVisualRoot"]
+[node name="WeaponMounts" type="Node3D" parent="."]
 
-[node name="LeftGunMuzzle" type="Marker3D" parent="VisualYawRoot/BankingRoot/HoverVisualRoot/WeaponMounts"]
+[node name="LeftGunMuzzle" type="Marker3D" parent="WeaponMounts"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.15, -0.2, -0.8)
 
-[node name="RightGunMuzzle" type="Marker3D" parent="VisualYawRoot/BankingRoot/HoverVisualRoot/WeaponMounts"]
+[node name="MuzzleFlash" parent="WeaponMounts/LeftGunMuzzle" instance=ExtResource("6_flash")]
+
+[node name="RightGunMuzzle" type="Marker3D" parent="WeaponMounts"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.15, -0.2, -0.8)
+
+[node name="MuzzleFlash" parent="WeaponMounts/RightGunMuzzle" instance=ExtResource("6_flash")]
 
 [node name="CrashDetector" type="Area3D" parent="."]
 collision_layer = 0

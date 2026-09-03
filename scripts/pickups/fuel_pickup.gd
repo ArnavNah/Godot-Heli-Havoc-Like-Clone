@@ -25,19 +25,23 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 
 func _physics_process(delta: float) -> void:
-	if is_collected:
+	if not is_inside_tree() or is_collected:
 		return
 	
 	time_elapsed += delta
 	
-	if not target_player or not is_instance_valid(target_player):
+	# Find player if not tracked or left the tree
+	if not target_player or not is_instance_valid(target_player) or not target_player.is_inside_tree():
+		target_player = null
 		var players = get_tree().get_nodes_in_group("PlayerHeli")
 		if players.is_empty():
 			players = get_tree().get_nodes_in_group("player")
-		if not players.is_empty():
-			target_player = players[0]
+		for p in players:
+			if is_instance_valid(p) and p.is_inside_tree():
+				target_player = p
+				break
 	
-	if target_player and is_instance_valid(target_player):
+	if target_player and is_instance_valid(target_player) and target_player.is_inside_tree():
 		var mult = GameManager.get_stat_multiplier("magnet_radius") if GameManager else 1.0
 		var eff_radius = magnet_radius * mult
 		var dist = global_position.distance_to(target_player.global_position)

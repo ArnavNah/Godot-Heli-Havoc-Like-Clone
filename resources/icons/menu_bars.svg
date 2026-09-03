@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <filter id="mShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <!-- 3 Rounded Menu Bars with Dots on Left -->
+  <circle cx="34" cy="38" r="7" fill="#FFFFFF" filter="url(#mShadow)"/>
+  <rect x="48" y="31" width="56" height="14" rx="7" fill="#FFFFFF" filter="url(#mShadow)"/>
+  
+  <circle cx="34" cy="64" r="7" fill="#FFFFFF" filter="url(#mShadow)"/>
+  <rect x="48" y="57" width="56" height="14" rx="7" fill="#FFFFFF" filter="url(#mShadow)"/>
+  
+  <circle cx="34" cy="90" r="7" fill="#FFFFFF" filter="url(#mShadow)"/>
+  <rect x="48" y="83" width="56" height="14" rx="7" fill="#FFFFFF" filter="url(#mShadow)"/>
+</svg>

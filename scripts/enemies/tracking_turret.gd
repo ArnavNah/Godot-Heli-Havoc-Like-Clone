@@ -100,6 +100,7 @@ func shoot() -> void:
 	# Spawn turret muzzle flash locked to barrel
 	if MuzzleFlashScene:
 		var flash = MuzzleFlashScene.instantiate()
+		flash.auto_free_after_burst = true
 		if muzzle:
 			muzzle.add_child(flash)
 			flash.position = Vector3.ZERO

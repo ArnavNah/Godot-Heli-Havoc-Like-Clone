@@ -1,72 +1,123 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Script" path="res://scripts/ui/menu_ui.gd" id="2_ui"]
-[ext_resource type="PackedScene" path="res://scenes/player/player_helicopter_visual.tscn" id="3_vis"]
+[ext_resource type="Theme" path="res://resources/themes/heli_theme.tres" id="3_theme"]
+[ext_resource type="FontFile" path="res://resources/fonts/cartoon_bold.ttf" id="4_font"]
+[ext_resource type="PackedScene" path="res://scenes/player/player_helicopter_visual.tscn" id="5_vis"]
+[ext_resource type="Texture2D" path="res://resources/icons/coin.svg" id="6_coin"]
+[ext_resource type="Texture2D" path="res://resources/icons/sound_on.svg" id="7_sound"]
+[ext_resource type="Texture2D" path="res://resources/icons/music_note.svg" id="8_music"]
+[ext_resource type="Texture2D" path="res://resources/icons/locker.svg" id="9_locker"]
 
 [sub_resource type="Environment" id="Environment_menu"]
 background_mode = 1
-background_color = Color(0.04, 0.12, 0.28, 1)
+background_color = Color(0.12, 0.65, 0.95, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.85, 0.9, 1, 1)
-ambient_light_energy = 0.65
-tonemap_mode = 2
-tonemap_exposure = 1.0
-fog_enabled = false
+ambient_light_color = Color(0.85, 0.92, 1, 1)
+ambient_light_energy = 0.95
+tonemap_mode = 0
+fog_enabled = true
+fog_light_color = Color(0.15, 0.75, 0.98, 1)
+fog_light_energy = 0.8
+fog_density = 0.005
 
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
-font_size = 56
-font_color = Color(1, 0.9, 0.1, 1)
+font = ExtResource("4_font")
+font_size = 52
+font_color = Color(1, 1, 1, 1)
 outline_size = 12
-outline_color = Color(0.08, 0.12, 0.25, 1)
-shadow_size = 8
-shadow_color = Color(0, 0, 0, 0.6)
-shadow_offset = Vector2(3, 5)
+outline_color = Color(0.06, 0.08, 0.16, 1)
+shadow_size = 6
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_offset = Vector2(0, 4)
 
-[sub_resource type="LabelSettings" id="LabelSettings_subtitle"]
-font_size = 18
-font_color = Color(0.9, 0.95, 1, 1)
-outline_size = 6
-outline_color = Color(0.08, 0.12, 0.25, 1)
+[sub_resource type="LabelSettings" id="LabelSettings_coin"]
+font = ExtResource("4_font")
+font_size = 28
+font_color = Color(1, 1, 1, 1)
+outline_size = 7
+outline_color = Color(0.06, 0.08, 0.16, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_play_btn"]
-bg_color = Color(0.1, 0.82, 0.35, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_top"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.18, 0.55, 0.92, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
-border_width_bottom = 5
-border_color = Color(0.04, 0.45, 0.18, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+border_width_bottom = 4
+border_color = Color(0.06, 0.22, 0.48, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 1
+shadow_offset = Vector2(0, 4)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_play_btn_hover"]
-bg_color = Color(0.18, 0.95, 0.45, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 5
-border_color = Color(0.05, 0.55, 0.22, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_play"]
+content_margin_left = 40.0
+content_margin_top = 14.0
+content_margin_right = 40.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.75, 0.05, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(0.48, 0.25, 0.02, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 2
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_play_hover"]
+content_margin_left = 40.0
+content_margin_top = 14.0
+content_margin_right = 40.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.82, 0.15, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(0.48, 0.25, 0.02, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 2
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_play_pressed"]
+content_margin_left = 40.0
+content_margin_top = 18.0
+content_margin_right = 40.0
+content_margin_bottom = 12.0
+bg_color = Color(0.95, 0.65, 0.02, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.48, 0.25, 0.02, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [sub_resource type="LabelSettings" id="LabelSettings_hs"]
+font = ExtResource("4_font")
 font_size = 20
 font_color = Color(1, 1, 1, 1)
 outline_size = 6
 outline_color = Color(0.05, 0.08, 0.18, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_loading"]
-font_size = 72
-font_color = Color(1, 1, 1, 1)
-outline_size = 12
-outline_color = Color(0.08, 0.1, 0.2, 1)
-shadow_size = 10
-shadow_color = Color(0, 0, 0, 0.8)
-shadow_offset = Vector2(3, 5)
 
 [node name="MainMenu" type="Node3D"]
 script = ExtResource("1_menu")
@@ -75,79 +126,119 @@ script = ExtResource("1_menu")
 environment = SubResource("Environment_menu")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 2, 8, 5)
+transform = Transform3D(0.766044, -0.422618, 0.485121, 0, 0.75471, 0.656059, -0.642788, -0.50257, 0.578142, 0, 20, 0)
 light_color = Color(1, 0.98, 0.95, 1)
-light_energy = 1.35
+light_energy = 1.2
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.994522, 0.104528, 0, -0.104528, 0.994522, 0, 1.15, 4.8)
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 3.2, 5.5)
 current = true
-fov = 52.0
+fov = 55.0
 
 [node name="HelicopterRoot" type="Node3D" parent="."]
-transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 0, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 
-[node name="PlayerHelicopterVisual" parent="HelicopterRoot" instance=ExtResource("3_vis")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+[node name="PlayerHelicopterVisual" parent="HelicopterRoot" instance=ExtResource("5_vis")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, 0, 0)
 
 [node name="MenuUI" type="CanvasLayer" parent="."]
 script = ExtResource("2_ui")
 
-[node name="TopTitle" type="VBoxContainer" parent="MenuUI"]
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 36.0
-offset_bottom = 130.0
-grow_horizontal = 2
-theme_override_constants/separation = 4
-alignment = 1
-
-[node name="TitleLabel" type="Label" parent="MenuUI/TopTitle"]
-layout_mode = 2
-text = "HELI HAVOC"
-label_settings = SubResource("LabelSettings_title")
-horizontal_alignment = 1
-
-[node name="SubtitleLabel" type="Label" parent="MenuUI/TopTitle"]
-layout_mode = 2
-text = "ARCADE SURVIVAL"
-label_settings = SubResource("LabelSettings_subtitle")
-horizontal_alignment = 1
-
-[node name="CenterContainer" type="Control" parent="MenuUI"]
+[node name="TopBar" type="Control" parent="MenuUI"]
 layout_mode = 3
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -160.0
-offset_top = -180.0
-offset_right = 160.0
-offset_bottom = -30.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MenuUI/CenterContainer"]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 14
+mouse_filter = 2
+theme = ExtResource("3_theme")
+
+[node name="Margin" type="MarginContainer" parent="MenuUI/TopBar"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 36
+
+[node name="TitleLabel" type="Label" parent="MenuUI/TopBar/Margin"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "HELI HAVOC"
+label_settings = SubResource("LabelSettings_title")
+
+[node name="HBox" type="HBoxContainer" parent="MenuUI/TopBar/Margin"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="CoinContainer" type="HBoxContainer" parent="MenuUI/TopBar/Margin/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="CoinIcon" type="TextureRect" parent="MenuUI/TopBar/Margin/HBox/CoinContainer"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+texture = ExtResource("6_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinLabel" type="Label" parent="MenuUI/TopBar/Margin/HBox/CoinContainer"]
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_coin")
+
+[node name="RightHBox" type="HBoxContainer" parent="MenuUI/TopBar/Margin"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_constants/separation = 12
+
+[node name="SoundBtn" type="Button" parent="MenuUI/TopBar/Margin/RightHBox"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_top")
+icon = ExtResource("7_sound")
+icon_alignment = 1
+expand_icon = true
+
+[node name="MusicBtn" type="Button" parent="MenuUI/TopBar/Margin/RightHBox"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_top")
+icon = ExtResource("8_music")
+icon_alignment = 1
+expand_icon = true
+
+[node name="CenterContainer" type="CenterContainer" parent="MenuUI"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -200.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("3_theme")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuUI/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
 alignment = 1
 
 [node name="PlayButton" type="Button" parent="MenuUI/CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(260, 60)
+custom_minimum_size = Vector2(240, 68)
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 28
-theme_override_styles/normal = SubResource("StyleBoxFlat_play_btn")
-theme_override_styles/hover = SubResource("StyleBoxFlat_play_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_play_btn")
-text = "▶ PLAY"
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_play")
+theme_override_styles/hover = SubResource("StyleBoxFlat_play_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_play_pressed")
+text = "Play"
 
 [node name="HighScoreLabel" type="Label" parent="MenuUI/CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -155,8 +246,42 @@ text = "🏆 HIGH SCORE: 0"
 label_settings = SubResource("LabelSettings_hs")
 horizontal_alignment = 1
 
+[node name="BottomRightLocker" type="MarginContainer" parent="MenuUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -120.0
+offset_top = -120.0
+grow_horizontal = 0
+grow_vertical = 0
+theme = ExtResource("3_theme")
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 28
+
+[node name="VBox" type="VBoxContainer" parent="MenuUI/BottomRightLocker"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="LockerBtn" type="Button" parent="MenuUI/BottomRightLocker/VBox"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_top")
+icon = ExtResource("9_locker")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Label" type="Label" parent="MenuUI/BottomRightLocker/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 14
+text = "Locker"
+horizontal_alignment = 1
+
 [node name="LoadingScreen" type="CanvasLayer" parent="."]
-layer = 10
+layer = 100
 visible = false
 
 [node name="ColorRect" type="ColorRect" parent="LoadingScreen"]
@@ -165,7 +290,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 1)
+color = Color(0.04, 0.12, 0.28, 1)
 
 [node name="LoadingLabel" type="Label" parent="LoadingScreen/ColorRect"]
 layout_mode = 1
@@ -174,14 +299,14 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -60.0
-offset_right = 250.0
-offset_bottom = 60.0
+offset_left = -100.0
+offset_top = -20.0
+offset_right = 100.0
+offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-pivot_offset = Vector2(250, 60)
+theme = ExtResource("3_theme")
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 32
 text = "LOADING..."
-label_settings = SubResource("LabelSettings_loading")
 horizontal_alignment = 1
-vertical_alignment = 1

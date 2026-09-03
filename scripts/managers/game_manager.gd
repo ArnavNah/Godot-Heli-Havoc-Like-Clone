@@ -1,3 +1,4 @@
+@tool
 extends Node
 
 const UpgradeDataClass = preload("res://scripts/resources/upgrade_data.gd")
@@ -47,7 +48,6 @@ func _load_upgrades() -> void:
 		"res://resources/upgrades/weapon_damage.tres",
 		"res://resources/upgrades/fire_rate.tres",
 		"res://resources/upgrades/additional_projectile.tres",
-		"res://resources/upgrades/rocket_damage.tres",
 		"res://resources/upgrades/magnet_radius.tres",
 		"res://resources/upgrades/xp_gain.tres",
 		"res://resources/upgrades/coin_value.tres"
@@ -203,9 +203,15 @@ func apply_upgrade(upgrade_resource: Resource) -> void:
 		_trigger_level_up()
 
 func _update_player_stats() -> void:
-	var players = get_tree().get_nodes_in_group("PlayerHeli")
+	if not is_inside_tree():
+		return
+	var tree = get_tree()
+	if not tree:
+		return
+	
+	var players = tree.get_nodes_in_group("PlayerHeli")
 	if players.is_empty():
-		players = get_tree().get_nodes_in_group("player")
+		players = tree.get_nodes_in_group("player")
 	
 	for p in players:
 		if p is PlayerHeli:
@@ -213,9 +219,18 @@ func _update_player_stats() -> void:
 			var fire_mult = get_stat_multiplier("fire_rate")
 			var fuel_mult = get_stat_multiplier("max_fuel")
 			var fuel_eff = get_stat_multiplier("fuel_efficiency")
+			var turn_mult = get_stat_multiplier("turn_speed")
+			var boost_mult = get_stat_multiplier("boost_power")
+			var accel_mult = get_stat_multiplier("acceleration")
+			
 			p.max_speed = 27.0 * speed_mult
-			p.forward_acceleration = 48.0 * get_stat_multiplier("acceleration")
+			p.forward_acceleration = 48.0 * accel_mult
+			p.steering_acceleration = 62.0 * accel_mult
+			p.reverse_acceleration = 85.0 * accel_mult
 			p.fire_cooldown = 0.11 / maxf(1.0, fire_mult)
+			p.yaw_speed = 7.5 * turn_mult
+			p.lift_acceleration = 24.0 * boost_mult
+			p.max_rise_speed = 10.0 * boost_mult
 			
 			if p.fuel_component:
 				p.fuel_component.set_max_fuel(100.0 * fuel_mult)
