@@ -111,6 +111,15 @@ func test_player_heli_structure() -> void:
 	assert_gt(spd, 20.0, "Max speed must be > 20")
 	assert_gt(float(heli.get("pitch_torque")), 100.0, "Pitch torque must be > 100")
 
+func test_player_position_watchdog_requests_recovery() -> void:
+	var heli_scene = ResourceLoader.load("res://scenes/player/player_heli.tscn", "", ResourceLoader.CACHE_MODE_REPLACE) as PackedScene
+	var heli = track(heli_scene.instantiate())
+	heli.controls_locked = false
+	heli.last_requested_move_dir = Vector3.FORWARD
+	heli.watchdog_anchor_position = heli.global_position
+	heli._update_position_stuck_watchdog(heli.position_watchdog_delay)
+	assert_true(heli.watchdog_recovery_requested, "A commanded helicopter that does not move must request recovery")
+
 func test_wing_effects_removed() -> void:
 	var heli_scene = ResourceLoader.load("res://scenes/player/player_heli.tscn", "", ResourceLoader.CACHE_MODE_REPLACE) as PackedScene
 	var heli = track(heli_scene.instantiate())

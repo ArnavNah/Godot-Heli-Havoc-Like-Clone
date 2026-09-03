@@ -18,6 +18,7 @@ func _process(delta: float) -> void:
 func reset() -> void:
 	survival_time = 0.0
 	is_active = true
+	set_process(true)
 	time_updated.emit(0.0)
 
 func get_projectile_speed_multiplier() -> float:

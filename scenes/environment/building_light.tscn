@@ -7,7 +7,7 @@ size = Vector3(16, 90, 16)
 size = Vector3(16, 90, 16)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lightblue"]
-albedo_color = Color(0.18, 0.46, 0.88, 1)
+albedo_color = Color(0.065, 0.17, 0.5, 1)
 roughness = 0.85
 
 [node name="BuildingLight" type="StaticBody3D"]

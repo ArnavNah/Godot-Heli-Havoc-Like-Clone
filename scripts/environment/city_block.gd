@@ -59,11 +59,12 @@ func _cleanup() -> void:
 			child.queue_free()
 
 # --- LAYOUT 0 (A): Two Large Parallel Blocks + Clear Corridor ---
-func _build_layout_a_parallel_corridor(_difficulty: float) -> void:
+func _build_layout_a_parallel_corridor(difficulty: float) -> void:
 	var h1 = randf_range(22.0, 32.0)
 	var h2 = randf_range(22.0, 32.0)
-	_spawn_pillar(Vector3(-14, 0, 0), 14, 38, h1, true)
-	_spawn_pillar(Vector3(14, 0, 0), 14, 38, h2, true)
+	var allow_turrets = difficulty > 0.0
+	_spawn_pillar(Vector3(-14, 0, 0), 14, 38, h1, allow_turrets)
+	_spawn_pillar(Vector3(14, 0, 0), 14, 38, h2, allow_turrets)
 	_spawn_coin_trail(Vector3(0, 18, -18), Vector3(0, 18, 18), 8)
 	if randf() < 0.4:
 		_spawn_fuel(Vector3(0, 18, 0))

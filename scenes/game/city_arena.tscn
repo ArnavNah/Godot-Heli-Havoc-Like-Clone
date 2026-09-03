@@ -9,19 +9,20 @@
 
 [sub_resource type="Environment" id="Environment_arena"]
 background_mode = 1
-background_color = Color(0.12, 0.72, 0.96, 1)
+background_color = Color(0.02, 0.88, 0.96, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.85, 0.9, 1, 1)
-ambient_light_energy = 0.7
+ambient_light_color = Color(0.4, 0.58, 0.85, 1)
+ambient_light_energy = 0.45
 fog_enabled = true
-fog_light_color = Color(0.15, 0.85, 0.98, 1)
-fog_light_energy = 0.6
-fog_density = 0.002
-fog_sky_affect = 0.3
-fog_height = 4.0
-fog_height_density = 0.04
-fog_depth_begin = 40.0
-fog_depth_end = 260.0
+fog_light_color = Color(0.52, 0.88, 1, 1)
+fog_light_energy = 0.85
+fog_density = 0.009
+fog_sky_affect = 0.18
+fog_height = 3.5
+fog_height_density = 0.55
+fog_depth_curve = 0.8
+fog_depth_begin = 35.0
+fog_depth_end = 165.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_city_ground"]
 albedo_color = Color(0.075, 0.14, 0.22, 1)
@@ -53,6 +54,7 @@ collision_layer = 2
 collision_mask = 0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+visible = false
 mesh = SubResource("PlaneMesh_city_ground")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]

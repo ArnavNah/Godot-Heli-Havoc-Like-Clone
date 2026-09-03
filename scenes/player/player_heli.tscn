@@ -8,12 +8,12 @@
 [ext_resource type="PackedScene" path="res://scenes/effects/muzzle_flash.tscn" id="6_flash"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_heli"]
-friction = 0.2
-bounce = 0.05
+friction = 0.0
+bounce = 0.12
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_col"]
-radius = 0.85
-height = 3.0
+radius = 0.72
+height = 2.6
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_crash"]
 size = Vector3(2.6, 1.8, 3.4)

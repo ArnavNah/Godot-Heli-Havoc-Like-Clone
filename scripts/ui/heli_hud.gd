@@ -8,7 +8,7 @@ var player: PlayerHeli = null
 @onready var level_label: Label = get_node_or_null("TopBar/Margin/HBox/LevelContainer/LevelLabel")
 @onready var xp_bar: ProgressBar = get_node_or_null("TopBar/Margin/HBox/XPContainer/XPBar")
 @onready var xp_label: Label = get_node_or_null("TopBar/Margin/HBox/XPContainer/XPBar/XPLabel")
-@onready var time_label: Label = get_node_or_null("TopBar/Margin/HBox/TimeContainer/TimeLabel")
+@onready var time_label: Label = get_node_or_null("TopBar/Margin/CenterWaveVBox/TimeHBox/TimeLabel")
 @onready var coin_label: Label = get_node_or_null("TopBar/Margin/HBox/CoinContainer/CoinLabel")
 @onready var distance_label: Label = get_node_or_null("TopBar/Margin/LeftColumn/Counters/DistCounter/Label")
 @onready var elims_label: Label = get_node_or_null("TopBar/Margin/LeftColumn/Counters/ElimsCounter/Label")
@@ -78,6 +78,7 @@ func _ready() -> void:
 	_start_countdown_sequence()
 
 func _start_countdown_sequence() -> void:
+	elapsed_time = 0.0
 	if not countdown_overlay or not countdown_label:
 		if player:
 			player.unlock_controls()
@@ -91,6 +92,7 @@ func _start_countdown_sequence() -> void:
 	
 	var sm = get_node_or_null("/root/SurvivalManager")
 	if sm:
+		sm.reset()
 		sm.is_active = false
 	
 	# Step 3
@@ -137,14 +139,10 @@ func _process(delta: float) -> void:
 		
 	elapsed_time += delta
 	
-	# Update Time from SurvivalManager or local clock
-	var time_formatted = "00:00"
-	var sm = get_node_or_null("/root/SurvivalManager")
-	if sm and sm.has_method("get_formatted_time"):
-		time_formatted = sm.get_formatted_time()
-	else:
-		var total_sec = int(elapsed_time)
-		time_formatted = "%02d:%02d" % [int(float(total_sec) / 60.0), total_sec % 60]
+	# The HUD owns the visible run clock. Keeping this local avoids a stale
+	# autoload state leaving the label at 00:00 after scene transitions.
+	var total_sec = int(elapsed_time)
+	var time_formatted = "%02d:%02d" % [int(float(total_sec) / 60.0), total_sec % 60]
 	
 	if time_label:
 		time_label.text = time_formatted
@@ -200,14 +198,14 @@ func _on_player_died() -> void:
 		countdown_overlay.visible = false
 	
 	if game_over_modal:
-		var sm = get_node_or_null("/root/SurvivalManager")
-		var time_str = sm.get_formatted_time() if sm else "%.1f" % elapsed_time
+		var total_sec = int(elapsed_time)
+		var time_str = "%02d:%02d" % [int(float(total_sec) / 60.0), total_sec % 60]
 		var coins_val = GameManager.gold if GameManager else 0
 		var elims_val = GameManager.kills if GameManager else 0
 		var dist_val = player.distance_traveled if player else 0.0
 		
 		if stat_time_label:
-			stat_time_label.text = "%.1f" % elapsed_time
+			stat_time_label.text = time_str
 		if stat_gold_label:
 			stat_gold_label.text = "%d" % coins_val
 		if stat_elims_label:

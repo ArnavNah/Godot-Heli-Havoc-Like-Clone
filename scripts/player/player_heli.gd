@@ -15,7 +15,8 @@ const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 @export var mass_kg: float = 60.0
 @export var base_lift_ratio: float = 0.90 # Leaves enough uncompensated weight for a visible neutral descent
 @export var collective_strength: float = 2.25 # Fast arcade climb while holding Space / Up
-@export var neutral_descent_speed: float = 1.35 # Automatic sink rate whenever lift is released
+@export var neutral_descent_speed: float = 2.25 # Automatic sink rate whenever lift is released
+@export var descent_accel: float = 8.0 # Responsive but recoverable downward acceleration at neutral input
 @export var altitude_assist_strength: float = 70.0 # Force response toward the neutral sink rate
 @export var dive_lift_ratio: float = 0.25 # Thrust reduction when actively holding descend
 
@@ -24,6 +25,12 @@ const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 @export var reverse_acceleration: float = 90.0 # Extra counter-steering brake in m/s²
 @export var horizontal_drag: float = 1.35 # Air-drag coefficient; preserves a short amount of inertia
 @export var max_speed: float = 42.0 # Horizontal top speed in m/s
+@export var wall_escape_accel: float = 30.0 # Separates the body from walls instead of letting thrust pin it
+@export var wall_escape_speed: float = 4.0
+@export var stuck_recovery_delay: float = 0.35
+@export var stuck_recovery_speed: float = 9.0
+@export var position_watchdog_delay: float = 0.85
+@export var position_watchdog_min_distance: float = 0.35
 
 @export_group("3. Cyclic Pitch, Roll & Yaw Torque")
 @export var pitch_torque: float = 2300.0
@@ -36,16 +43,23 @@ const MuzzleFlashScene = preload("res://scenes/effects/muzzle_flash.tscn")
 @export_group("4. Auto Stabilization & Limits")
 @export var stabilization_strength: float = 24.0 # Physical leveling torque strength
 @export var angular_damping: float = 6.0
+@export var max_angular_speed: float = 2.4 # Prevent collision impulses from causing an unrecoverable tumble
 @export var max_rise_speed: float = 16.0
-@export var max_fall_speed: float = 7.5
+@export var max_fall_speed: float = 12.0
 
-@export_group("5. Weapons & Auto-Aim")
+@export_group("5. Crash Rules")
+@export var crash_altitude: float = 2.25 # Crossing this height triggers the normal death/game-over flow
+@export var damage_invuln_duration: float = 1.0 # Prevent overlapping turret hits from stacking in one burst
+@export var building_collision_damage: int = 5
+@export var recovery_invuln_duration: float = 2.0
+
+@export_group("6. Weapons & Auto-Aim")
 @export var bullet_scene: PackedScene = preload("res://scenes/projectiles/player_bullet.tscn")
 @export var target_marker_scene: PackedScene = preload("res://scenes/effects/target_marker.tscn")
 @export var fire_cooldown: float = 0.11
 @export var auto_aim_radius: float = 24.0
 
-@export_group("6. Fuel Economy")
+@export_group("7. Fuel Economy")
 @export var base_fuel_drain_rate: float = 2.0
 @export var lift_fuel_drain_rate: float = 3.6
 
@@ -90,6 +104,17 @@ var fire_left_next: bool = true
 var current_target: Node3D = null
 var target_marker_instance: Node3D = null
 var building_contact_cooldown: float = 0.0
+var damage_invuln_timer: float = 0.0
+var stuck_timer: float = 0.0
+@export_storage var stuck_recovery_count: int = 0
+var last_clear_transform: Transform3D = Transform3D.IDENTITY
+var has_last_clear_transform: bool = false
+var last_requested_move_dir: Vector3 = Vector3.ZERO
+var watchdog_anchor_position: Vector3 = Vector3.ZERO
+var watchdog_sample_timer: float = 0.0
+var watchdog_recovery_requested: bool = false
+var watchdog_recovery_direction: Vector3 = Vector3.ZERO
+var unstuck_key_was_pressed: bool = false
 
 var instakill_timer: float = 0.0
 var double_coins_timer: float = 0.0
@@ -102,6 +127,32 @@ func unlock_controls() -> void:
 
 func update_input(vector: Vector2) -> void:
 	joystick_input = vector
+
+func _update_position_stuck_watchdog(delta: float) -> void:
+	var unstuck_key_pressed = Input.is_key_pressed(KEY_R)
+	if unstuck_key_pressed and not unstuck_key_was_pressed and not controls_locked:
+		watchdog_recovery_requested = true
+		watchdog_recovery_direction = last_requested_move_dir
+		sleeping = false
+	unstuck_key_was_pressed = unstuck_key_pressed
+
+	if controls_locked or last_requested_move_dir.length_squared() < 0.04:
+		watchdog_sample_timer = 0.0
+		watchdog_anchor_position = global_position
+		return
+	sleeping = false
+
+	watchdog_sample_timer += delta
+	if watchdog_sample_timer < position_watchdog_delay:
+		return
+
+	var horizontal_delta = global_position - watchdog_anchor_position
+	horizontal_delta.y = 0.0
+	if horizontal_delta.length() < position_watchdog_min_distance:
+		watchdog_recovery_requested = true
+		watchdog_recovery_direction = last_requested_move_dir
+	watchdog_anchor_position = global_position
+	watchdog_sample_timer = 0.0
 
 func _ready() -> void:
 	mass = mass_kg
@@ -116,6 +167,7 @@ func _ready() -> void:
 	collision_mask = 22
 	
 	last_pos = global_position
+	watchdog_anchor_position = global_position
 	
 	if health_component:
 		if health_component.has_signal("health_changed"):
@@ -170,12 +222,18 @@ func _process(delta: float) -> void:
 		return
 	
 	motion_time += delta
+	_update_position_stuck_watchdog(delta)
 	
 	# Timers
 	if building_contact_cooldown > 0.0:
 		building_contact_cooldown = maxf(0.0, building_contact_cooldown - delta)
+	if damage_invuln_timer > 0.0:
+		damage_invuln_timer = maxf(0.0, damage_invuln_timer - delta)
 	if spawn_invuln_timer > 0.0:
 		spawn_invuln_timer = maxf(0.0, spawn_invuln_timer - delta)
+	if spawn_invuln_timer <= 0.0 and global_position.y <= crash_altitude:
+		_trigger_altitude_crash()
+		return
 	if instakill_timer > 0.0:
 		instakill_timer = maxf(0.0, instakill_timer - delta)
 	if double_coins_timer > 0.0:
@@ -225,11 +283,42 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var dt = state.step
 	if dt <= 0.0:
 		dt = 0.016
+	if watchdog_recovery_requested:
+		var requested_dir = watchdog_recovery_direction.normalized()
+		if requested_dir.length_squared() < 0.01:
+			requested_dir = -state.transform.basis.z.normalized()
+		var watchdog_transform = last_clear_transform if has_last_clear_transform else state.transform
+		watchdog_transform.origin += Vector3.UP * 0.6
+		state.transform = watchdog_transform
+		state.linear_velocity = requested_dir * stuck_recovery_speed + Vector3.UP * 4.0
+		state.angular_velocity = Vector3.ZERO
+		damage_invuln_timer = maxf(damage_invuln_timer, recovery_invuln_duration)
+		watchdog_recovery_requested = false
+		stuck_timer = 0.0
+		stuck_recovery_count += 1
+		return
 		
-	var basis = state.transform.basis.orthonormalized()
-	var local_up = basis.y
-	var local_forward = -basis.z
-	var local_right = basis.x
+	var body_basis = state.transform.basis.orthonormalized()
+	var local_up = body_basis.y
+	var local_forward = -body_basis.z
+	var local_right = body_basis.x
+	var contact_count = state.get_contact_count()
+	if not has_last_clear_transform:
+		last_clear_transform = state.transform
+		has_last_clear_transform = true
+	elif contact_count == 0 and state.transform.origin.y > crash_altitude + 1.0:
+		last_clear_transform = state.transform
+	var wall_contact_normals: Array[Vector3] = []
+	for contact_index in contact_count:
+		var contact_normal = body_basis * state.get_contact_local_normal(contact_index)
+		var contact_world = state.transform * state.get_contact_local_position(contact_index)
+		var away_from_contact = state.transform.origin - contact_world
+		if contact_normal.dot(away_from_contact) < 0.0:
+			contact_normal = -contact_normal
+		if absf(contact_normal.y) < 0.65:
+			contact_normal.y = 0.0
+			if contact_normal.length_squared() > 0.001:
+				wall_contact_normals.append(contact_normal.normalized())
 	
 	# --------------------------------------------------------------------------
 	# 1. Camera-Relative Input Reading (Keyboard WASD + Virtual Joystick)
@@ -249,6 +338,24 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var move_dir = (cam_right * input_2d.x) + (cam_forward * (-input_2d.y))
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
+	last_requested_move_dir = move_dir
+
+	# Combine wall normals at ordinary corners. If opposite faces cancel each
+	# other in a narrow wedge, choose the face that best matches escape input.
+	var wall_escape_normal = Vector3.ZERO
+	for contact_normal in wall_contact_normals:
+		wall_escape_normal += contact_normal
+	if wall_escape_normal.length_squared() > 0.001:
+		wall_escape_normal = wall_escape_normal.normalized()
+	elif not wall_contact_normals.is_empty():
+		wall_escape_normal = wall_contact_normals[0]
+		if move_dir.length_squared() > 0.01:
+			var best_alignment = -INF
+			for contact_normal in wall_contact_normals:
+				var alignment = contact_normal.dot(move_dir)
+				if alignment > best_alignment:
+					best_alignment = alignment
+					wall_escape_normal = contact_normal
 	
 	var wants_lift = not controls_locked and (
 		Input.is_action_pressed("fly_up") 
@@ -281,6 +388,10 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	# --------------------------------------------------------------------------
 	var h_vel = Vector3(state.linear_velocity.x, 0.0, state.linear_velocity.z)
 	var cyclic_horizontal = Vector3(local_up.x, 0.0, local_up.z)
+	if wall_escape_normal.length_squared() > 0.001:
+		var inward_thrust = cyclic_horizontal.dot(wall_escape_normal)
+		if inward_thrust < 0.0:
+			cyclic_horizontal -= wall_escape_normal * inward_thrust
 	state.apply_central_force(cyclic_horizontal * forward_acceleration * mass)
 	state.apply_central_force(-h_vel * horizontal_drag * mass)
 
@@ -295,6 +406,49 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 		var limited_h_vel = h_vel.normalized() * max_speed
 		state.linear_velocity.x = limited_h_vel.x
 		state.linear_velocity.z = limited_h_vel.z
+
+	# Static-body contacts used to cancel movement and leave the helicopter
+	# wedged against a facade. Build a small outward speed over a few frames;
+	# once separated, normal flight forces take over again.
+	if wall_escape_normal.length_squared() > 0.001:
+		var outward_speed = state.linear_velocity.dot(wall_escape_normal)
+		if outward_speed < wall_escape_speed:
+			var escape_delta = minf(wall_escape_speed - outward_speed, wall_escape_accel * dt)
+			state.linear_velocity += wall_escape_normal * escape_delta
+
+	# Roof edges can trap the capsule between upward and sideways contacts. When
+	# that happens, restore the last transform recorded without any contacts;
+	# pushing from the overlapping transform is unreliable at concave corners.
+	var pilot_contact_stall = (
+		not controls_locked
+		and contact_count > 0
+		and move_dir.length_squared() > 0.04
+		and h_vel.length() < 1.25
+	)
+	var passive_corner_wedge = contact_count >= 2 and state.linear_velocity.length() < 0.8
+	if pilot_contact_stall or passive_corner_wedge:
+		stuck_timer += dt
+	else:
+		stuck_timer = maxf(0.0, stuck_timer - dt * 2.0)
+	if stuck_timer >= stuck_recovery_delay:
+		var recovery_dir = move_dir.normalized() if move_dir.length_squared() > 0.01 else wall_escape_normal
+		if recovery_dir.length_squared() < 0.01:
+			recovery_dir = -local_forward
+		elif wall_escape_normal.length_squared() > 0.001:
+			if recovery_dir.dot(wall_escape_normal) < 0.0:
+				recovery_dir = wall_escape_normal
+			else:
+				recovery_dir = (recovery_dir + wall_escape_normal).normalized()
+		var recovery_transform = last_clear_transform if has_last_clear_transform else state.transform
+		recovery_transform.origin += Vector3.UP * 0.45
+		state.transform = recovery_transform
+		state.linear_velocity.x = recovery_dir.x * stuck_recovery_speed
+		state.linear_velocity.z = recovery_dir.z * stuck_recovery_speed
+		state.linear_velocity.y = 3.5
+		state.angular_velocity *= 0.15
+		damage_invuln_timer = maxf(damage_invuln_timer, recovery_invuln_duration)
+		stuck_timer = 0.0
+		stuck_recovery_count += 1
 	
 	# --------------------------------------------------------------------------
 	# 3. Continuous Rotor Lift along Local Up Axis
@@ -318,13 +472,10 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var total_lift = weight * lift_mult
 	state.apply_central_force(local_up * total_lift)
 	
-	# Releasing collective always produces an intentional, controlled sink. This
-	# remains active during horizontal flight and uses force rather than teleporting.
-	if not wants_lift and not wants_descend:
-		var target_vertical_velocity = -neutral_descent_speed
-		var descent_error = target_vertical_velocity - state.linear_velocity.y
-		var descent_assist = descent_error * altitude_assist_strength
-		state.apply_central_force(Vector3.UP * descent_assist)
+	# Releasing vertical input produces a steep gravity-assisted drop for fast
+	# altitude dodges. The terminal-velocity clamp below keeps it bounded.
+	if not controls_locked and not wants_lift and not wants_descend:
+		state.linear_velocity.y -= descent_accel * dt
 	
 	# Cap maximum vertical rise & fall speed
 	state.linear_velocity.y = clampf(state.linear_velocity.y, -max_fall_speed, max_rise_speed)
@@ -360,7 +511,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var pitch_error = target_pitch - current_pitch
 	var roll_error = target_roll - current_roll
 	var pitch_damping = state.angular_velocity.dot(local_right) * angular_damping * mass
-	var roll_axis = basis.z
+	var roll_axis = body_basis.z
 	var roll_damping = state.angular_velocity.dot(roll_axis) * angular_damping * mass
 	state.apply_torque(local_right * (pitch_error * pitch_gain - pitch_damping))
 	state.apply_torque(roll_axis * (roll_error * roll_gain - roll_damping))
@@ -377,10 +528,14 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	else:
 		state.apply_torque(Vector3.UP * (-state.angular_velocity.y * angular_damping * mass))
 	
-	# Safety: prevent over-rotation / tumbling upside down
-	if local_up.y < 0.55:
+	# Safety: aggressively recover from collision-induced rolls before the
+	# helicopter can become trapped against a building upside down.
+	if local_up.y < 0.8:
 		var righting_axis = local_up.cross(Vector3.UP)
-		state.apply_torque(righting_axis * stabilization_strength * mass * 4.0)
+		state.apply_torque(righting_axis * stabilization_strength * mass * 8.0)
+
+	if state.angular_velocity.length() > max_angular_speed:
+		state.angular_velocity = state.angular_velocity.normalized() * max_angular_speed
 
 # ==============================================================================
 # 💥 DAMAGE, FUEL, TARGETING & SHOOTING
@@ -394,8 +549,9 @@ func _drain_fuel(amount: float) -> void:
 		GameManager.boost_changed.emit(GameManager.boost, GameManager.max_boost)
 
 func take_damage(amount: int) -> void:
-	if not is_alive or spawn_invuln_timer > 0.0:
+	if not is_alive or spawn_invuln_timer > 0.0 or damage_invuln_timer > 0.0:
 		return
+	damage_invuln_timer = damage_invuln_duration
 	
 	var armor_mult = GameManager.get_stat_multiplier("armor") if GameManager else 1.0
 	var final_amount = maxi(1, int(amount / maxf(0.2, armor_mult)))
@@ -410,6 +566,14 @@ func take_damage(amount: int) -> void:
 
 func take_hit(amount: int) -> void:
 	take_damage(amount)
+
+func _trigger_altitude_crash() -> void:
+	if not is_alive:
+		return
+	if health_component and health_component.has_method("take_damage"):
+		health_component.take_damage(maxi(1, int(health_component.current_health)))
+	else:
+		_on_death()
 
 func heal(amount: int) -> void:
 	if not is_alive:
@@ -486,7 +650,7 @@ func shoot() -> void:
 		bullet.setup(shoot_dir, damage)
 	
 	# Extra Projectiles Upgrade
-	var extra_bullets = GameManager.get_stat_flat_value("extra_projectiles") if GameManager else 0
+	var extra_bullets: int = int(GameManager.get_stat_flat_value("extra_projectiles")) if GameManager else 0
 	if extra_bullets > 0:
 		for i in range(extra_bullets):
 			var angle_deg = 5.0 * (i + 1) * (-1 if i % 2 == 0 else 1)
@@ -525,12 +689,13 @@ func _find_best_target() -> Node3D:
 	
 	return best_enemy
 
-func _on_crash_detector_body_entered(body: Node3D) -> void:
+func _on_crash_detector_body_entered(_body: Node3D) -> void:
 	if building_contact_cooldown > 0.0 or not is_alive or spawn_invuln_timer > 0.0:
 		return
 	
-	building_contact_cooldown = 0.5
-	take_damage(20)
+	building_contact_cooldown = 1.5
+	angular_velocity *= 0.35
+	take_damage(building_collision_damage)
 	
 	var cam_rig = get_tree().root.find_child("CameraRig", true, false)
 	if cam_rig and cam_rig.has_method("add_shake"):
